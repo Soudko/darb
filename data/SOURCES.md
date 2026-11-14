@@ -16,7 +16,9 @@ Only official pages were used for facts. Positions come from OpenStreetMap (Nomi
 - lifts = yes: https://www.tamdeen.com/16april2018.shtml (owner Tamdeen Group's own newsroom page, April 2018, may be out of date)
   Quote: "conveniently placed elevators and escalators" (car-park entrances).
 - Seen but not mapped: "wheelchairs and mobility scooters for the elderly" among free customer services.
-- Unknown: entrances, parking (multi-storey car park, no accessible bays stated), toilets, seating. The official mall site alkout.com returned no readable content.
+- entrances = yes and parking = yes (Google listing data, not official; added at the user's request 2026-11-14): https://www.google.com/maps/place?q=place_id:ChIJ25_VS4sHzz8Rr3BpUEk-m5U
+  Listing text: "Wheelchair-accessible car park; Wheelchair-accessible entrance" (a third item was cut off and not used).
+- Unknown: toilets, seating. The official mall site alkout.com returned no readable content.
 
 ## The Scientific Center of Kuwait (scientific-center-kuwait)
 - Position: https://www.openstreetmap.org/way/314148911 (29.3496, 48.0895)

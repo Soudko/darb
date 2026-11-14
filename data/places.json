@@ -51,13 +51,17 @@
       "photo": "",
       "facilities": {
         "entrances": {
-          "available": "unknown",
-          "source": "Not checked yet",
+          "available": "yes",
+          "note_ar": "تذكر قائمة خرائط جوجل للمكان أن المدخل مهيأ للكراسي المتحركة (مصدر غير رسمي من الموقع).",
+          "note_en": "The Google Maps listing says the entrance is wheelchair-accessible. This is Google listing data, not the mall's own statement.",
+          "source": "Google Maps listing for Al Kout Mall (not the mall's own site): https://www.google.com/maps/place?q=place_id:ChIJ25_VS4sHzz8Rr3BpUEk-m5U",
           "date": "2026-11-14"
         },
         "parking": {
-          "available": "unknown",
-          "source": "Not checked yet",
+          "available": "yes",
+          "note_ar": "تذكر قائمة خرائط جوجل للمكان أن موقف السيارات مهيأ للكراسي المتحركة (مصدر غير رسمي من الموقع).",
+          "note_en": "The Google Maps listing says the car park is wheelchair-accessible. This is Google listing data, not the mall's own statement.",
+          "source": "Google Maps listing for Al Kout Mall (not the mall's own site): https://www.google.com/maps/place?q=place_id:ChIJ25_VS4sHzz8Rr3BpUEk-m5U",
           "date": "2026-11-14"
         },
         "lifts": {
