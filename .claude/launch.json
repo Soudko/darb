@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "darb",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "PORT=5180 npm start"],
+      "port": 5180
+    }
+  ]
+}

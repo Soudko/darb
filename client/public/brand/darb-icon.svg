@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-labelledby="t">
+  <title id="t">Darb</title>
+  <!-- Apple-style app icon: continuous-corner (squircle) tile, layered glass glyph. For the web, favicon and slides. -->
+  <defs>
+    <path id="squircle" d="M330 0H694C960 0 1024 64 1024 330V694C1024 960 960 1024 694 1024H330C64 1024 0 960 0 694V330C0 64 64 0 330 0Z"/>
+    <clipPath id="mask"><use href="#squircle"/></clipPath>
+
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1B5597"/>
+      <stop offset="0.55" stop-color="#0B2D5B"/>
+      <stop offset="1" stop-color="#071F44"/>
+    </linearGradient>
+    <radialGradient id="bgLight" cx="0.5" cy="0" r="0.8">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="roadFill" gradientUnits="userSpaceOnUse" x1="330" y1="1000" x2="668" y2="487">
+      <stop offset="0" stop-color="#00B5B8"/>
+      <stop offset="0.5" stop-color="#6ED9D1"/>
+      <stop offset="1" stop-color="#F4F8FB"/>
+    </linearGradient>
+    <linearGradient id="pinFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#DCEAF3"/>
+    </linearGradient>
+    <!-- glass light: bright on the top-left edges, a faint return light on the bottom-right -->
+    <linearGradient id="spec" gradientUnits="userSpaceOnUse" x1="300" y1="240" x2="900" y2="1020">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="0.75" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.4"/>
+    </linearGradient>
+    <linearGradient id="pinEdge" gradientUnits="userSpaceOnUse" x1="0" y1="240" x2="0" y2="580">
+      <stop offset="0" stop-color="#8FB3CC" stop-opacity="0"/>
+      <stop offset="1" stop-color="#8FB3CC" stop-opacity="0.9"/>
+    </linearGradient>
+
+    <path id="road" d="M668 487 C590 492 528 515 533 550 C538 580 640 592 740 610 C860 632 915 665 912 705 C908 760 800 805 690 855 C590 900 530 960 495 998 C470 1022 400 1020 345 1000 C290 978 270 930 300 875 C330 820 430 790 560 765 C660 745 738 728 736 695 C734 668 660 655 560 642 C470 630 418 610 422 570 C426 520 540 492 668 487Z"/>
+    <path id="pin" fill-rule="evenodd" clip-rule="evenodd" d="M680 431 A123 123 0 1 1 882 431 C854 471 812 532 796 557 Q781 584 766 557 C750 532 708 471 680 431Z M836 362 A55 55 0 1 0 726 362 A55 55 0 1 0 836 362Z"/>
+    <clipPath id="roadClip"><path d="M668 487 C590 492 528 515 533 550 C538 580 640 592 740 610 C860 632 915 665 912 705 C908 760 800 805 690 855 C590 900 530 960 495 998 C470 1022 400 1020 345 1000 C290 978 270 930 300 875 C330 820 430 790 560 765 C660 745 738 728 736 695 C734 668 660 655 560 642 C470 630 418 610 422 570 C426 520 540 492 668 487Z"/></clipPath>
+    <clipPath id="pinClip"><path clip-rule="evenodd" d="M680 431 A123 123 0 1 1 882 431 C854 471 812 532 796 557 Q781 584 766 557 C750 532 708 471 680 431Z M836 362 A55 55 0 1 0 726 362 A55 55 0 1 0 836 362Z"/></clipPath>
+
+    <filter id="lift" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#020B1A" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <g clip-path="url(#mask)">
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+    <rect width="1024" height="1024" fill="url(#bgLight)"/>
+
+    <g transform="translate(512 512) scale(0.8) translate(-591 -630)" filter="url(#lift)">
+      <use href="#road" fill="url(#roadFill)"/>
+      <g clip-path="url(#roadClip)"><use href="#road" fill="none" stroke="url(#spec)" stroke-width="12"/></g>
+      <use href="#pin" fill="url(#pinFill)"/>
+      <g clip-path="url(#pinClip)"><use href="#pin" fill="none" stroke="url(#pinEdge)" stroke-width="12"/></g>
+    </g>
+
+    <!-- hairline of light inside the tile edge -->
+    <use href="#squircle" fill="none" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="6"/>
+  </g>
+</svg>

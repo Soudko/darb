@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-960 200 1892 844" width="1892" height="844" role="img" aria-labelledby="t">
+  <title id="t">درب Darb</title>
+  <!-- Darb logo, Arabic layout: mark on the right, the name درب drawn as vector strokes (no font needed). For dark (navy) backgrounds. Transparent background. -->
+  <defs>
+    <linearGradient id="road" gradientUnits="userSpaceOnUse" x1="330" y1="1000" x2="668" y2="487">
+      <stop offset="0" stop-color="#00B5B8"/>
+      <stop offset="0.5" stop-color="#6ED9D1"/>
+      <stop offset="1" stop-color="#F4F8FB"/>
+    </linearGradient>
+  </defs>
+
+  <!-- mark: road and pin -->
+  <path fill="url(#road)" d="M668 487 C590 492 528 515 533 550 C538 580 640 592 740 610 C860 632 915 665 912 705 C908 760 800 805 690 855 C590 900 530 960 495 998 C470 1022 400 1020 345 1000 C290 978 270 930 300 875 C330 820 430 790 560 765 C660 745 738 728 736 695 C734 668 660 655 560 642 C470 630 418 610 422 570 C426 520 540 492 668 487Z"/>
+  <path fill="#F4F8FB" fill-rule="evenodd" d="M680 431 A123 123 0 1 1 882 431 C854 471 812 532 796 557 Q781 584 766 557 C750 532 708 471 680 431Z M836 362 A55 55 0 1 0 726 362 A55 55 0 1 0 836 362Z"/>
+
+  <!-- name: درب, read right to left (د ر ب) -->
+  <g transform="translate(-878 668) scale(2.4)" fill="none" stroke="#F4F8FB" stroke-width="34" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M355 -92 L403 -46 V-18 Q403 0 385 0 H347"/>   <!-- د dal -->
+    <path d="M290 -44 C290 8 268 42 222 58"/>              <!-- ر ra -->
+    <path d="M190 -48 V-18 Q190 0 172 0 H22 Q0 0 0 -22 V-42"/> <!-- ب ba -->
+    <circle cx="95" cy="48" r="21" fill="#6ED9D1" stroke="none"/> <!-- ب dot, teal like the pin -->
+  </g>
+</svg>

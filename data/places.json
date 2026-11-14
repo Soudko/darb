@@ -1,0 +1,25 @@
+{
+  "places": [
+    {
+      "id": "sample-place",
+      "name_ar": "مكان تجريبي",
+      "name_en": "Sample place",
+      "is_sample": true,
+      "type": "mall",
+      "lat": 29.3759,
+      "lng": 47.9774,
+      "photo": "",
+      "facilities": {
+        "entrances": { "available": "yes", "note_en": "Sample: step-free main entrance", "source": "Darb team sample (not a real place)", "date": "2026-11-14" },
+        "parking": { "available": "yes", "count": 4, "source": "Darb team sample (not a real place)", "date": "2026-11-14" },
+        "lifts": { "available": "yes", "source": "Darb team sample (not a real place)", "date": "2026-11-14" },
+        "toilets": { "available": "unknown", "source": "Darb team sample (not a real place)", "date": "2026-11-14" },
+        "seating": { "available": "no", "source": "Darb team sample (not a real place)", "date": "2026-11-14" }
+      },
+      "points": [
+        { "id": "sample-entrance", "kind": "entrance", "name_ar": "المدخل الرئيسي", "name_en": "Main entrance", "lat": 29.37595, "lng": 47.97745, "accessible": true, "quiet": false },
+        { "id": "sample-parking", "kind": "parking", "name_ar": "موقف ذوي الإعاقة", "name_en": "Accessible parking", "lat": 29.37585, "lng": 47.97735, "accessible": true, "quiet": false }
+      ]
+    }
+  ]
+}
