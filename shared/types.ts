@@ -91,6 +91,25 @@ export interface SubmitPlaceRequest {
   photos?: { kind: PhotoKind; data_url: string }[]; // data:image/jpeg|png|webp;base64,...
 }
 
+// GET /api/directory: public support, government and service information, each with its source.
+export type DirectorySection = 'government' | 'support' | 'services';
+export const DIRECTORY_SECTIONS: DirectorySection[] = ['government', 'support', 'services'];
+export interface DirectoryEntry {
+  id: string;
+  section: DirectorySection;
+  name_ar: string;
+  name_en: string;
+  what_ar: string;
+  what_en: string;
+  how_ar: string;
+  how_en: string;
+  phone: string; // exactly as published, or ""
+  website: string; // the organisation's own site, or ""
+  source: string; // the page the facts came from
+  checked: string; // YYYY-MM-DD
+  official_source: boolean; // the organisation's own site or a .gov.kw portal
+}
+
 export type Lang = 'ar' | 'en';
 
 // POST /api/assistant

@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { aiStatus } from './ai';
 import { assistantRouter } from './assistant';
 import { communityRouter, listCommunityPlaces } from './community';
+import { getDirectory } from './directory';
 import { errorBody, HttpError } from './errors';
 import { getPlaces } from './places';
 import { listenHost } from './host';
@@ -24,6 +25,7 @@ export function createApp() {
     res.json(s.status === 'ready' ? { ok: true, ai: 'ready', model: s.model } : { ok: true, ai: 'not_set_up' });
   });
   app.get('/api/places', async (_req, res) => res.json({ places: [...getPlaces(), ...(await listCommunityPlaces())] }));
+  app.get('/api/directory', (_req, res) => res.json({ entries: getDirectory() }));
   app.use('/api/assistant', assistantRouter());
   app.use('/api', (_req, res) => res.status(404).json(errorBody('not_found', 'Not found.')));
 

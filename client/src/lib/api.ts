@@ -1,5 +1,5 @@
 // The only place the screens call the server.
-import type { AssistantRequest, AssistantResponse, ErrorCode, PlaceView, SubmitPlaceRequest } from '../../../shared/types';
+import type { AssistantRequest, AssistantResponse, ErrorCode, PlaceView, SubmitPlaceRequest, DirectoryEntry } from '../../../shared/types';
 
 export class ApiFailure extends Error {
   constructor(public code: ErrorCode | 'offline') {
@@ -41,4 +41,13 @@ export async function submitPlace(req: SubmitPlaceRequest): Promise<PlaceView> {
 
 export function reportPlace(id: string, message: string): Promise<{ ok: true }> {
   return call<{ ok: true }>(`/api/community/places/${encodeURIComponent(id)}/report`, { method: 'POST', body: JSON.stringify({ message }) });
+}
+
+let directoryCache: Promise<DirectoryEntry[]> | null = null;
+export function getDirectory(): Promise<DirectoryEntry[]> {
+  if (!directoryCache) {
+    directoryCache = call<{ entries: DirectoryEntry[] }>('/api/directory').then((r) => r.entries);
+    directoryCache.catch(() => (directoryCache = null));
+  }
+  return directoryCache;
 }
