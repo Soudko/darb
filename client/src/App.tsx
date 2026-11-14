@@ -7,6 +7,7 @@ import { Needs } from './screens/Needs';
 import { Home } from './screens/Home';
 import { Settings } from './screens/Settings';
 import { Coming } from './screens/Coming';
+import { GovServices } from './screens/GovServices';
 import { Directory, isDirectoryPage } from './screens/Directory';
 import { About } from './screens/About';
 import { MapScreen } from './screens/MapScreen';
@@ -27,6 +28,7 @@ export function App() {
     case 'place': return <PlaceDetails id={route.param ?? ''} />;
     case 'add': return <AddPlace />;
     case 'assistant': return <Assistant initialQuestion={route.query.get('q') ?? undefined} />;
+    case 'gov': return <GovServices id={route.param} />;
     case 'alerts': return <Coming name="alerts" />;
     case 'coming': return isDirectoryPage(route.param) ? <Directory page={route.param} /> : <Coming name={route.param ?? ''} />;
     default: return getPrefs().onboarded ? <Home /> : <Splash />;

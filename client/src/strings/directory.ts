@@ -1,6 +1,16 @@
 // Wording for the Support, Government services and Services pages, in Arabic and English.
 export const directory: { ar: Record<string, string>; en: Record<string, string> } = {
   ar: {
+    'gov.title': 'الخدمات الحكومية لذوي الإعاقة',
+    'gov.subtitle': 'تعرّف على الخدمات والتسهيلات الحكومية المتوفرة لك في الكويت',
+    'gov.authority': 'الجهة المسؤولة',
+    'gov.eligibility': 'من يستفيد',
+    'gov.steps': 'خطوات التقديم',
+    'gov.check': 'يرجى التأكد من الشروط الحالية لدى الجهة المختصة.',
+    'gov.visit': 'زيارة الموقع الرسمي',
+    'gov.all': 'كل الخدمات',
+    'gov.notfound': 'لم نجد هذه الخدمة.',
+    'gov.footer': 'درب منصة إرشادية مستقلة، وليست جهة حكومية رسمية.',
     'dir.intro': 'معلومات عامة جمعها فريق درب من مواقع منشورة للعموم. تأكد من الجهة نفسها قبل الاعتماد عليها.',
     'dir.not_official': 'درب مشروع طلابي ولا يمثل أي جهة رسمية.',
     'dir.section.government': 'الخدمات الحكومية',
@@ -19,6 +29,16 @@ export const directory: { ar: Record<string, string>; en: Record<string, string>
     'dir.opens_new': '(يفتح في نافذة جديدة)',
   },
   en: {
+    'gov.title': 'Government services for people with disabilities',
+    'gov.subtitle': 'Learn about the government services and facilities available to you in Kuwait',
+    'gov.authority': 'Responsible authority',
+    'gov.eligibility': 'Who can use it',
+    'gov.steps': 'How to apply',
+    'gov.check': 'Please check the current requirements with the responsible authority.',
+    'gov.visit': 'Visit the official website',
+    'gov.all': 'All services',
+    'gov.notfound': 'We could not find this service.',
+    'gov.footer': 'Darb is an independent guide, not an official government body.',
     'dir.intro': 'Public information collected by the Darb team from published websites. Check with the organisation itself before relying on it.',
     'dir.not_official': 'Darb is a student project and does not represent any official body.',
     'dir.section.government': 'Government services',

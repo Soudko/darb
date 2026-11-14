@@ -11,7 +11,7 @@ const tiles: { key: string; Icon: LucideIcon; to: () => void }[] = [
   { key: 'places', Icon: Navigation, to: () => go('map') },
   { key: 'nav', Icon: MapPin, to: () => go('coming', 'voice') },
   { key: 'support', Icon: Headset, to: () => go('coming', 'support') },
-  { key: 'gov', Icon: Landmark, to: () => go('coming', 'government') },
+  { key: 'gov', Icon: Landmark, to: () => go('gov') },
 ];
 
 export function Home(_props: {}) {
