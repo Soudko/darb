@@ -7,7 +7,8 @@ export function PlaceThumb({ place, large = false }: { place: PlaceView; large?:
   const [failed, setFailed] = useState(false);
   const Icon = TYPE_ICON[place.type] ?? TYPE_ICON.other;
   const cls = `place-thumb${large ? ' place-thumb-large' : ''}`;
-  if (!place.photo || failed) {
+  const src = place.community?.photos[0]?.url ?? (place.photo ? `/places/${place.photo}` : '');
+  if (!src || failed) {
     return (
       <div className={`${cls} place-thumb-empty`} aria-hidden="true">
         <Icon size={large ? 56 : 32} strokeWidth={1.5} />
@@ -16,7 +17,7 @@ export function PlaceThumb({ place, large = false }: { place: PlaceView; large?:
   }
   return (
     <div className={cls}>
-      <img src={`/places/${place.photo}`} alt="" loading="lazy" onError={() => setFailed(true)} />
+      <img src={src} alt="" loading="lazy" onError={() => setFailed(true)} />
     </div>
   );
 }

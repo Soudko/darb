@@ -5,6 +5,7 @@ import { Composer, MAX_LEN } from '../components/assistant/Composer';
 import { Turn, type PickView, type TurnData } from '../components/assistant/Turn';
 import { ApiFailure, askAssistant, getPlaces } from '../lib/api';
 import { speak, stopSpeaking, unlockSpeech } from '../lib/speak';
+import { setAiActivity } from '../state/aiActivity';
 import { deviceId, getPrefs, usePrefs } from '../state/prefs';
 import { t as text, useT } from '../strings';
 import type { AssistantResponse, ChatTurn } from '../../../shared/types';
@@ -57,6 +58,10 @@ export function Assistant({ initialQuestion }: { initialQuestion?: string }) {
     };
   }, []);
   const busy = turns.some((x) => x.status === 'loading');
+  useEffect(() => {
+    setAiActivity(busy ? 'thinking' : 'idle');
+    return () => setAiActivity('idle');
+  }, [busy]);
   const nextId = useRef(savedNextId);
   const busyRef = useRef(false);
   const replyRef = useRef<HTMLDivElement>(null);

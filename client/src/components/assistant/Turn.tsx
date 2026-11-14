@@ -1,12 +1,13 @@
 import { forwardRef, useEffect, useState } from 'react';
-import { Sparkles, Map as MapIcon, Square, Volume2 } from 'lucide-react';
-import type { AssistantResponse, PlaceView } from '../../../../shared/types';
+import { Sparkles, Map as MapIcon, Square, Volume2, MapPinPlus, ExternalLink } from 'lucide-react';
+import type { AssistantAction, AssistantResponse, PlaceView } from '../../../../shared/types';
 import { FactList } from './FactList';
 import { PlaceCard } from '../place/PlaceCard';
 import { go } from '../../lib/nav';
 import { canSpeak, speak, stopSpeaking } from '../../lib/speak';
 import { usePrefs } from '../../state/prefs';
 import { useT } from '../../strings';
+import { setAiActivity } from '../../state/aiActivity';
 
 export interface PickView {
   place: PlaceView;
@@ -35,7 +36,11 @@ function AiBubble({ children, reply, ai = true }: { children: React.ReactNode; r
 function ListenButton({ text, lang }: { text: string; lang: 'ar' | 'en' }) {
   const t = useT();
   const [playing, setPlaying] = useState(false);
-  useEffect(() => () => { if (playing) stopSpeaking(); }, [playing]);
+  useEffect(() => {
+    if (!playing) return;
+    setAiActivity('speaking');
+    return () => { stopSpeaking(); setAiActivity('idle'); };
+  }, [playing]);
   if (!canSpeak()) return null;
   const toggle = () => {
     if (playing) {
@@ -52,6 +57,18 @@ function ListenButton({ text, lang }: { text: string; lang: 'ar' | 'en' }) {
       {playing ? t('assistant.stop') : t('assistant.listen')}
     </button>
   );
+}
+
+// A button for an action the server checked. It only navigates when the user presses it.
+function ActionButton({ action }: { action: AssistantAction }) {
+  const t = useT();
+  if (action.type === 'open_add_place') {
+    return <button type="button" className="btn btn-secondary as-map-btn" onClick={() => go('add')}><MapPinPlus size={20} aria-hidden="true" /> {t('assistant.open_add')}</button>;
+  }
+  if (action.type === 'open_place') {
+    return <button type="button" className="btn btn-secondary as-map-btn" onClick={() => go('place', action.place_id)}><ExternalLink size={20} aria-hidden="true" /> {t('assistant.open_place')}</button>;
+  }
+  return <button type="button" className="btn btn-secondary as-map-btn" onClick={() => go('map', undefined, action.place_id ? { focus: action.place_id } : undefined)}><MapIcon size={20} aria-hidden="true" /> {t('assistant.open_map')}</button>;
 }
 
 function MapButton() {
@@ -116,7 +133,8 @@ export const Turn = forwardRef<HTMLDivElement, Props>(function Turn({ turn, busy
         <AiBubble reply={ref}>
           <p className="as-reply" lang={r.reply_lang} dir={r.reply_lang === 'ar' ? 'rtl' : 'ltr'}>{r.reply}</p>
           <ListenButton text={r.reply} lang={r.reply_lang} />
-          {picks.length === 0 && r.places.length === 0 && /مكان|أماكن|place|venue|mall|مجمع/i.test(turn.question) && <MapButton />}
+          {r.action && <ActionButton action={r.action} />}
+          {!r.action && picks.length === 0 && r.places.length === 0 && /مكان|أماكن|place|venue|mall|مجمع/i.test(turn.question) && <MapButton />}
         </AiBubble>
         {picks.length > 0 && (
           <div className="as-picks">

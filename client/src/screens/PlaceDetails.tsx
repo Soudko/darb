@@ -6,6 +6,7 @@ import { FACILITY_KEYS } from '../../../shared/types';
 import { Screen } from '../components/Screen';
 import { StatusBadge } from '../components/place/StatusBadge';
 import { PlaceThumb } from '../components/place/PlaceThumb';
+import { CommunityBadge, CommunitySection } from '../components/community/CommunitySection';
 import { usePlaces } from '../components/place/usePlaces';
 import { go } from '../lib/nav';
 import { usePrefs } from '../state/prefs';
@@ -64,6 +65,7 @@ function Body({ place, tab, setTab }: { place: PlaceView; tab: Tab; setTab: (t: 
       <div className="details-head">
         <h1>{name}</h1>
         <StatusBadge status={place.status} />
+        <CommunityBadge place={place} />
         {place.is_sample && <span className="label-sample">{t('honest.sample')}</span>}
       </div>
 
@@ -86,6 +88,7 @@ function Body({ place, tab, setTab }: { place: PlaceView; tab: Tab; setTab: (t: 
       </div>
 
       <div id="panel-info" role="tabpanel" aria-labelledby="tab-info" hidden={tab !== 'info'}>
+        <CommunitySection place={place} />
         <InfoPanel place={place} />
       </div>
       <div id="panel-facilities" role="tabpanel" aria-labelledby="tab-facilities" hidden={tab !== 'facilities'}>

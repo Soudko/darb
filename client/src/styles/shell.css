@@ -193,3 +193,25 @@
 /* Review fixes: readable hero in simplified mode, visible focus on the hero in every theme */
 :root[data-simple='on'] .sh-hero { background: transparent; height: 210px; }
 .sh-hero-top :focus-visible { outline: 3px solid #ffffff; box-shadow: 0 0 0 6px #0b2d5b; }
+
+/* Add-place card icon */
+.sh-orb-icon { display: grid; place-items: center; color: #fff; }
+.sh-orb-icon svg { width: 46%; height: 46%; filter: drop-shadow(0 1px 3px rgba(7, 31, 68, 0.6)); }
+
+/* AI button in the bottom bar: a waveform that moves gently, and a soft pulse */
+.sh-wave-bar { fill: currentColor; transform-box: fill-box; transform-origin: center; transform: scaleY(0.45); }
+.sh-wave-bar:nth-child(2), .sh-wave-bar:nth-child(4) { transform: scaleY(0.75); }
+.sh-wave-bar:nth-child(3) { transform: scaleY(1); }
+@media (prefers-reduced-motion: no-preference) {
+  .sh-bar-ai .sh-wave-bar { animation: sh-wave 1.6s ease-in-out infinite; }
+  .sh-bar-ai { animation: sh-bar-pulse 3.6s ease-in-out infinite; }
+  .sh-bar-ai.is-active .sh-wave-bar { animation-duration: 0.7s; }
+  .sh-bar-ai.is-active { animation-duration: 1.4s; }
+  @keyframes sh-wave { 0%, 100% { transform: scaleY(0.4); } 50% { transform: scaleY(1); } }
+  @keyframes sh-bar-pulse {
+    0%, 100% { box-shadow: 0 0 16px rgba(110, 217, 209, 0.4), var(--glass-highlight); }
+    50% { box-shadow: 0 0 30px rgba(110, 217, 209, 0.75), var(--glass-highlight); }
+  }
+}
+:root[data-motion='reduced'] .sh-bar-ai, :root[data-motion='reduced'] .sh-bar-ai .sh-wave-bar { animation: none; }
+:root[data-contrast='high'] .sh-bar-ai { animation: none; }

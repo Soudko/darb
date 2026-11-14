@@ -6,6 +6,7 @@ import { usePrefs } from '../../state/prefs';
 import { useT } from '../../strings';
 import { StatusBadge } from './StatusBadge';
 import { PlaceThumb } from './PlaceThumb';
+import { CommunityBadge } from '../community/CommunitySection';
 import '../../styles/places.css';
 
 export interface PlaceCardProps { place: PlaceView; why?: string; distanceM?: number; }
@@ -27,6 +28,7 @@ export function PlaceCard({ place, why, distanceM }: PlaceCardProps) {
         <div className="place-card-info">
           <h2 className="place-card-name">{name}</h2>
           <StatusBadge status={place.status} />
+          <CommunityBadge place={place} />
           {distanceM !== undefined && <span className="place-distance">{formatDistance(distanceM, t)}</span>}
         </div>
       </div>

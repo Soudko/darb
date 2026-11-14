@@ -1,5 +1,5 @@
 // The only place the screens call the server.
-import type { AssistantRequest, AssistantResponse, ErrorCode, PlaceView } from '../../../shared/types';
+import type { AssistantRequest, AssistantResponse, ErrorCode, PlaceView, SubmitPlaceRequest } from '../../../shared/types';
 
 export class ApiFailure extends Error {
   constructor(public code: ErrorCode | 'offline') {
@@ -30,4 +30,15 @@ export function getPlaces(): Promise<PlaceView[]> {
 
 export function askAssistant(req: AssistantRequest): Promise<AssistantResponse> {
   return call<AssistantResponse>('/api/assistant', { method: 'POST', body: JSON.stringify(req) });
+}
+
+// Community places: after a submission the cached list is dropped so the map shows the new place.
+export async function submitPlace(req: SubmitPlaceRequest): Promise<PlaceView> {
+  const r = await call<{ place: PlaceView }>('/api/community/places', { method: 'POST', body: JSON.stringify(req) });
+  placesCache = null;
+  return r.place;
+}
+
+export function reportPlace(id: string, message: string): Promise<{ ok: true }> {
+  return call<{ ok: true }>(`/api/community/places/${encodeURIComponent(id)}/report`, { method: 'POST', body: JSON.stringify({ message }) });
 }

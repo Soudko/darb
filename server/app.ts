@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { aiStatus } from './ai';
 import { assistantRouter } from './assistant';
+import { communityRouter, listCommunityPlaces } from './community';
 import { errorBody, HttpError } from './errors';
 import { getPlaces } from './places';
 import { listenHost } from './host';
@@ -15,13 +16,14 @@ export function createApp() {
   const app = express();
   if (listenHost() !== 'localhost') app.set('trust proxy', 1);
   app.disable('x-powered-by');
+  app.use('/api/community', communityRouter()); // reads its own, larger JSON body (photos)
   app.use(express.json({ limit: '100kb' }));
 
   app.get('/api/health', (_req, res) => {
     const s = aiStatus();
     res.json(s.status === 'ready' ? { ok: true, ai: 'ready', model: s.model } : { ok: true, ai: 'not_set_up' });
   });
-  app.get('/api/places', (_req, res) => res.json({ places: getPlaces() }));
+  app.get('/api/places', async (_req, res) => res.json({ places: [...getPlaces(), ...(await listCommunityPlaces())] }));
   app.use('/api/assistant', assistantRouter());
   app.use('/api', (_req, res) => res.status(404).json(errorBody('not_found', 'Not found.')));
 

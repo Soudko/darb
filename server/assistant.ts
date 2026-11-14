@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { FACILITY_KEYS, NEEDS } from '../shared/types';
-import type { AssistantPlacePick, AssistantResponse, ChatTurn, Lang, Need, PlaceView } from '../shared/types';
+import type { AssistantAction, AssistantPlacePick, AssistantResponse, ChatTurn, Lang, Need, PlaceView } from '../shared/types';
 import { aiStatus, askJson } from './ai';
 import { HttpError } from './errors';
 import { getPlaces } from './places';
+import { listCommunityPlaces } from './community';
 
 const WINDOW_MS = 10 * 60 * 1000;
 const PER_DEVICE = 60;
@@ -43,12 +44,14 @@ How Darb works:
 - Whenever your reply mentions one of the records by name, include that record in "places" with its facts.
 - When the question is about finding or visiting a place, pick up to three records that fit and give for each a "why": one or two short sentences, in the reply's language, naming only facts found in that record. In "facts" list the facility keys (entrances, parking, lifts, toilets, seating) or point ids that back it. Otherwise return places [].
 - If the user asks about the accessibility or facilities of a specific named venue (a mall, hospital, restaurant, ministry or other place) that matches no record's name_ar or name_en, set unknown_place to true and places to []. Questions about places in general (for example "what should I check before visiting a mall?") are fine: answer them with general advice.
+- Some records have "verified": false. They are community submissions that nobody has reviewed. When you mention one, say clearly that its information is community-submitted and not verified. "answers" in such a record are the contributor's answers (yes, no or unknown); treat unknown as unknown.
+- Actions: when it helps, add an "action" that offers the user a button: {"type":"open_add_place"} when they want to add or describe a new place or ask for help filling the form (also explain the form's questions in the reply); {"type":"open_map"} or {"type":"open_map","place_id":id} when they want to go to a place or see the map; {"type":"open_place","place_id":id} to open a record's details. Only use place ids from the records. Never claim a route is wheelchair accessible. Nothing is submitted or published for the user: they review and confirm everything themselves. Omit "action" when none fits.
 - You have no live data: no traffic, opening hours, queues or government service status. Say so when asked.
 - Never give medical advice (medicines, doses, diagnosis). Never call a place or route "safe" («آمن»): Darb guides, it does not promise safety.
 - When asked to reword something the user wrote (for example a request to staff), write a clear, polite version they can show or say.
 - Adapt to the needs: hearing -> everything in text, never rely on sound; visual -> describe in words, never "look for the colour", screen-reader friendly; speech -> the user may type short or broken phrases, understand them kindly; cognitive or simple -> short sentences, one idea each, numbered steps; elderly -> plain, calm and patient; mobility -> think about steps, ramps, lifts, doors and distance.
 - Format: plain text only. Short paragraphs; for steps use lines starting "1." "2." or "•". No markdown, no ** or #, no tables. Usually under 150 words unless the user asks for more.
-Reply ONLY with JSON: {"unknown_place":bool,"reply":string,"reply_lang":"ar"|"en","places":[{"place_id":string,"why":string,"facts":[string]}]}`;
+Reply ONLY with JSON: {"unknown_place":bool,"reply":string,"reply_lang":"ar"|"en","places":[{"place_id":string,"why":string,"facts":[string]}],"action":{"type":string,"place_id":string}}`;
 
 const COGNITIVE_RULE =
   '\nThe user has cognitive needs: every sentence under 10 words, one idea per sentence, everyday words.';
@@ -65,6 +68,8 @@ function toRecord(p: PlaceView) {
   }
   return {
     id: p.id, name_ar: p.name_ar, name_en: p.name_en, type: p.type, status: p.status, facilities,
+    verified: !p.community || p.community.verification === 'verified',
+    ...(p.community ? { answers: p.community.answers, area: p.community.area, description: p.community.description, notes: p.community.answers_note } : {}),
     points: p.points.map((q) => ({ id: q.id, kind: q.kind, name_en: q.name_en, accessible: q.accessible, quiet: q.quiet })),
   };
 }
@@ -119,7 +124,18 @@ function checkAnswer(raw: Record<string, unknown>, places: PlaceView[]): Assista
   // Claims about places never promise safety. (General talk may use the word, e.g. "road safety".)
   const placeTexts = aboutPlaces ? [reply, ...picks.map((p) => p.why)] : [];
   if (placeTexts.some((x) => UNSAFE_WORDS.test(x))) throw noAnswer();
-  return { kind: 'answer', reply, reply_lang, places: picks, model: aiStatus().model ?? '' };
+  const action = checkAction(raw.action, places);
+  return { kind: 'answer', reply, reply_lang, places: picks, model: aiStatus().model ?? '', ...(action ? { action } : {}) };
+}
+
+// Only actions that point at real screens and real records get through.
+function checkAction(v: any, places: PlaceView[]): AssistantAction | undefined {
+  if (!v || typeof v !== 'object') return undefined;
+  const exists = (id: unknown) => typeof id === 'string' && places.some((p) => p.id === id);
+  if (v.type === 'open_add_place') return { type: 'open_add_place' };
+  if (v.type === 'open_map') return exists(v.place_id) ? { type: 'open_map', place_id: v.place_id } : { type: 'open_map' };
+  if (v.type === 'open_place' && exists(v.place_id)) return { type: 'open_place', place_id: v.place_id };
+  return undefined;
 }
 
 function parseHistory(v: unknown): ChatTurn[] {
@@ -172,7 +188,7 @@ export function assistantRouter(): Router {
       const check = await askJson({ system: MEDICAL_SYSTEM, user: JSON.stringify({ earlier, question }) });
       if (isTrue(check.medical)) return void res.json({ kind: 'medical' } satisfies AssistantResponse);
 
-      const all = getPlaces();
+      const all = [...getPlaces(), ...(await listCommunityPlaces())];
       const real = all.filter((p) => !p.is_sample);
       const places = real.length ? real : all;
 

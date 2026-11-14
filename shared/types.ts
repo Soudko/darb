@@ -47,6 +47,48 @@ export interface Place {
 // What GET /api/places returns for each place: the stored place plus its worked-out status.
 export interface PlaceView extends Place {
   status: AccessStatus;
+  community?: CommunityInfo; // present only for places submitted by users
+}
+
+// Community submissions: always shown as unverified until a moderator reviews them.
+export type Verification = 'pending' | 'unverified' | 'verified' | 'rejected';
+export type Answer = 'yes' | 'no' | 'unknown';
+export const QUESTION_KEYS = [
+  'wheelchair_entrance', 'ramp', 'elevator', 'accessible_parking', 'accessible_toilets', 'seating',
+  'wide_doors', 'step_free', 'signage', 'visual_aids', 'hearing_aids', 'quiet_space',
+] as const;
+export type QuestionKey = (typeof QUESTION_KEYS)[number];
+export const CATEGORY_KEYS = ['mall', 'restaurant', 'hospital', 'government', 'education', 'park', 'entertainment', 'other'] as const;
+export type CategoryKey = (typeof CATEGORY_KEYS)[number];
+export const PHOTO_KINDS = ['entrance', 'ramp', 'elevator', 'parking', 'restroom', 'seating', 'other'] as const;
+export type PhotoKind = (typeof PHOTO_KINDS)[number];
+
+export interface CommunityInfo {
+  verification: Verification;
+  category: CategoryKey;
+  governorate: string;
+  area: string;
+  address: string;
+  description: string;
+  answers: Partial<Record<QuestionKey, Answer>>;
+  answers_note: string;
+  photos: { id: string; kind: PhotoKind; url: string }[];
+  created_at: string;
+}
+
+// POST /api/community/places
+export interface SubmitPlaceRequest {
+  name: string;
+  category: CategoryKey;
+  governorate?: string;
+  area?: string;
+  address?: string;
+  description?: string;
+  lat: number;
+  lng: number;
+  answers: Partial<Record<QuestionKey, Answer>>;
+  answers_note?: string;
+  photos?: { kind: PhotoKind; data_url: string }[]; // data:image/jpeg|png|webp;base64,...
 }
 
 export type Lang = 'ar' | 'en';
@@ -73,10 +115,16 @@ export interface AssistantPlacePick {
   facts: string[]; // facility keys or point ids that back the reason, all checked by the server
 }
 
+// A button the screens may offer under a reply. The server only sends actions it has checked; nothing runs on its own.
+export type AssistantAction =
+  | { type: 'open_add_place' }
+  | { type: 'open_map'; place_id?: string }
+  | { type: 'open_place'; place_id: string };
+
 export type AssistantResponse =
   | { kind: 'medical' }
   | { kind: 'no_data' }
-  | { kind: 'answer'; reply: string; reply_lang: Lang; places: AssistantPlacePick[]; model: string };
+  | { kind: 'answer'; reply: string; reply_lang: Lang; places: AssistantPlacePick[]; model: string; action?: AssistantAction };
 
 // Every error from the server has this shape.
 export type ErrorCode =
@@ -88,6 +136,8 @@ export type ErrorCode =
   | 'ai_auth_failed'
   | 'ai_quota'
   | 'ai_model'
+  | 'forbidden'
+  | 'unavailable'
   | 'not_found'
   | 'server_error';
 

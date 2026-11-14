@@ -1,0 +1,47 @@
+/* Community places: the add form, community photos and the unverified label. */
+.cm-form { display: flex; flex-direction: column; gap: var(--gap); }
+.cm-card { display: flex; flex-direction: column; gap: 14px; margin: 0; min-width: 0; }
+.cm-card legend { padding: 0 6px; }
+.cm-card legend h2 { margin: 0; }
+.cm-card label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
+.cm-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+.cm-grow { flex: 1 1 140px; }
+.cm-error { color: var(--text); border: 2px solid #ff8f8f; border-radius: var(--radius-sm); padding: 10px 14px; }
+.cm-error ul { margin: 6px 0 0; padding-inline-start: 20px; }
+.cm-ok { display: inline-flex; gap: 6px; align-items: center; font-weight: 700; color: var(--link); }
+.cm-map { height: 280px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--glass-border); }
+.cm-marker span { display: block; width: 34px; height: 34px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg) scale(0.8); background: var(--teal); border: 3px solid #fff; box-shadow: 0 2px 10px rgba(2, 10, 30, 0.6); }
+.cm-thumbs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.cm-thumb { display: flex; flex-direction: column; gap: 8px; padding: 10px; }
+.cm-thumb img, .cm-thumbs img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; display: block; }
+.cm-small { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+.cm-q { display: flex; flex-direction: column; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid var(--glass-border); }
+.cm-q-label { font-weight: 700; }
+.cm-seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.cm-opt { position: relative; display: flex; align-items: center; justify-content: center; text-align: center; min-height: var(--tap); padding: 6px 8px; border-radius: 999px; border: 1.5px solid var(--glass-border); background: var(--glass); cursor: pointer; font-size: var(--fs-small); font-weight: 600; }
+.cm-opt input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.cm-opt.on { border-color: var(--teal); background: rgba(0, 168, 171, 0.28); box-shadow: var(--glow); }
+.cm-opt:focus-within { outline: var(--focus); outline-offset: 2px; }
+.cm-linkbtn { background: none; border: 0; padding: 6px 0; min-height: 40px; color: var(--link); font: 600 var(--fs-small) var(--font); text-decoration: underline; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.cm-suggest { margin-top: 6px; }
+.cm-review { display: grid; gap: 8px; margin: 0; }
+.cm-review div { display: flex; gap: 10px; justify-content: space-between; }
+.cm-review dt { color: var(--text-2); }
+.cm-review dd { margin: 0; font-weight: 700; text-align: end; }
+.cm-answers { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.cm-answers li { display: flex; justify-content: space-between; gap: 10px; }
+.cm-ans-yes { color: var(--link); }
+.cm-ans-unknown { color: var(--text-2); font-weight: 500; }
+.cm-unanswered { border: 1px dashed var(--teal-light); border-radius: var(--radius-sm); padding: 10px 14px; }
+.cm-done { align-items: center; text-align: center; }
+.cm-done-ic { color: var(--teal-light); }
+.cm-badge { display: inline-flex; align-items: center; min-height: 32px; padding: 2px 12px; border-radius: 999px; border: 1.5px dashed var(--teal-light); font-size: var(--fs-small); font-weight: 700; }
+.cm-badge-verified { border-style: solid; background: var(--teal); color: var(--navy); }
+.cm-gallery { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
+.cm-gallery figure { margin: 0; flex: none; width: 200px; }
+.cm-gallery img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; display: block; }
+.cm-gallery figcaption { font-size: var(--fs-small); color: var(--text-2); margin-top: 4px; }
+.cm-warn { border-inline-start: 4px solid var(--teal-light); padding-inline-start: 12px; }
+
+.cm-thumb .btn { padding: 0 14px; font-size: var(--fs-small); min-height: var(--tap); }
+.cm-thumb select { font-size: var(--fs-small); padding-inline: 12px; }
