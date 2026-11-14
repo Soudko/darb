@@ -6,3 +6,5 @@ Community places live in PostgreSQL (photos as bytea); tables created in dev onl
 Always unverified; never status 'full'. Moderation endpoints need an ADMIN_TOKEN secret the user has NOT set yet (503 until then).
 **Why:** no admin accounts; App Storage not set up; Autoscale disk is ephemeral.
 **How to apply:** the run-and-publish-only scope was lifted by the user for this feature only. tests/server/places.test.ts reads the live DB, so leftover test submissions make it fail; delete test rows after manual testing. health test fails whenever AI env is set (known, unchanged).
+
+Standing user instruction: commit and push to GitHub after every completed step/task (normal push, no force; git needs DANGEROUSLY_ALLOW_GIT=1).

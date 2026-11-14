@@ -1,6 +1,9 @@
 // Wording for adding community places, in Arabic and English.
 export const community: { ar: Record<string, string>; en: Record<string, string> } = {
   ar: {
+    'add.access.type': 'اختر نوع الإعاقة ثم حدّد المتوفر',
+    'add.access.answered': 'تمت الإجابة على',
+    'add.access.of': 'من',
     'voice.mic': 'تكلّم مع درب',
     'voice.stop': 'إيقاف الاستماع',
     'voice.listening': 'أسمعك... تكلّم الحين',
@@ -65,12 +68,12 @@ export const community: { ar: Record<string, string>; en: Record<string, string>
     'add.loc.outside': 'يجب أن يكون الموقع داخل الكويت.',
     'add.loc.map': 'خريطة اختيار الموقع',
     'add.sec.access': 'تقييم إمكانية الوصول',
-    'add.access.hint': 'أجب فقط عما تعرفه. اترك «غير معروف» إن لم تكن متأكداً.',
+    'add.access.hint': 'أجب فقط عما تعرفه. أي سؤال تتركه يبقى «غير معروف».',
     'add.access.note': 'معلومات إضافية عن إمكانية الوصول',
     'ans.yes': 'متوفر',
     'ans.no': 'غير متوفر',
     'ans.unknown': 'غير معروف',
-    'q.wheelchair_entrance': 'مدخل مناسب للكراسي المتحركة',
+    'q.wheelchair_entrance': 'مدخل مهيأ للكراسي المتحركة',
     'q.ramp': 'منحدر للكراسي المتحركة',
     'q.elevator': 'مصعد',
     'q.accessible_parking': 'مواقف مخصصة لذوي الإعاقة',
@@ -124,6 +127,9 @@ export const community: { ar: Record<string, string>; en: Record<string, string>
     'assistant.open_place': 'تفاصيل المكان',
   },
   en: {
+    'add.access.type': 'Choose a disability type, then mark what is available',
+    'add.access.answered': 'Answered',
+    'add.access.of': 'of',
     'voice.mic': 'Talk to Darb',
     'voice.stop': 'Stop listening',
     'voice.listening': 'Listening... speak now',
@@ -188,7 +194,7 @@ export const community: { ar: Record<string, string>; en: Record<string, string>
     'add.loc.outside': 'The location must be inside Kuwait.',
     'add.loc.map': 'Location picker map',
     'add.sec.access': 'Accessibility evaluation',
-    'add.access.hint': 'Answer only what you know. Leave "Unknown" if you are not sure.',
+    'add.access.hint': 'Answer only what you know. Any question you skip stays "Unknown".',
     'add.access.note': 'Extra accessibility information',
     'ans.yes': 'Available',
     'ans.no': 'Not available',

@@ -33,7 +33,7 @@
 .place-card-actions .btn { flex: 1 1 140px; padding: 0 16px; font-size: var(--fs-small); }
 
 /* Map screen */
-.places-map { display: flex; flex-direction: column; gap: 12px; }
+.places-map { display: flex; flex-direction: column; gap: 12px; flex: 1; min-width: 0; overflow-x: clip; }
 .map-toolbar { display: flex; flex-direction: column; gap: 8px; }
 .map-chips, .map-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .map-toolbar .chip { min-height: var(--tap); display: inline-flex; align-items: center; gap: 6px; }
@@ -41,7 +41,7 @@
 .map-badge { display: inline-grid; place-items: center; min-width: 22px; height: 22px; border-radius: 999px; background: var(--teal); color: var(--navy); font-size: var(--fs-small); font-weight: 700; }
 .map-note { margin: 0; }
 
-.map-wrap { position: relative; height: min(66dvh, 600px); min-height: 380px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--glass-border); }
+.map-wrap { position: relative; flex: 1; min-height: 380px; border-radius: var(--radius); overflow: hidden; }
 .map-wrap[hidden] { display: none; }
 .map-canvas { position: absolute; inset: 0; background: #1a2d4a; z-index: 0; }
 .map-dark .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9) saturate(0.6); }

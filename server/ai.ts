@@ -60,7 +60,7 @@ export interface AskArgs { system: string; user: string; history?: ChatMessage[]
 // A provider answer that retrying will not fix: a wrong key, no credit, or a wrong model name.
 function providerError(status: number): HttpError | null {
   if (status === 401 || status === 403) return new HttpError(502, 'ai_auth_failed', 'The AI key was refused.');
-  if (status === 429) return new HttpError(502, 'ai_quota', 'The AI service is busy or out of credit.');
+  if (status === 402 || status === 429) return new HttpError(502, 'ai_quota', 'The AI service is busy or out of credit.');
   if (status === 404) return new HttpError(502, 'ai_model', 'The AI model name is not available.');
   return null;
 }
@@ -76,7 +76,9 @@ async function once(c: AiConfig, a: AskArgs): Promise<Record<string, unknown> | 
       headers,
       signal: ctrl.signal,
       body: JSON.stringify({
-        model: c.model, // only model and messages: newer models reject temperature and max_tokens
+        model: c.model, // only model and messages: newer OpenAI models reject temperature and max_tokens
+        // OpenRouter reserves credit for the model's largest possible answer unless a limit is given.
+        ...(c.base.includes('openrouter.ai') ? { max_tokens: 4000 } : {}),
         messages: [
           { role: 'system', content: a.system },
           ...(a.history ?? []),

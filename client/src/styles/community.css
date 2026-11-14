@@ -45,3 +45,12 @@
 
 .cm-thumb .btn { padding: 0 14px; font-size: var(--fs-small); min-height: var(--tap); }
 .cm-thumb select { font-size: var(--fs-small); padding-inline: 12px; }
+
+.cm-drawer-h { margin: 0; }
+.cm-drawer-btn { width: 100%; min-height: var(--tap); display: flex; align-items: center; justify-content: space-between; gap: 12px; background: none; border: 0; padding: 0; color: inherit; font: 700 var(--fs-card) / 1.3 var(--font); text-align: start; cursor: pointer; }
+.cm-drawer-count { display: block; font-weight: 500; }
+.cm-chev { transition: transform var(--motion); flex: none; }
+.cm-chev.open { transform: rotate(180deg); }
+.cm-card[hidden], .cm-drawer [hidden] { display: none !important; }
+
+.cm-seg-2 { grid-template-columns: repeat(2, 1fr); }

@@ -1,7 +1,7 @@
 // «إضافة مكان جديد»: a form that saves a community place on the server. Nothing is sent until the user reviews and confirms.
 import { useRef, useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
-import { CATEGORY_KEYS, QUESTION_KEYS } from '../../../shared/types';
+import { CATEGORY_KEYS } from '../../../shared/types';
 import type { Answer, CategoryKey, PlaceView, QuestionKey } from '../../../shared/types';
 import { Screen } from '../components/Screen';
 import { PhotoPicker, type PickedPhoto } from '../components/community/PhotoPicker';
@@ -13,7 +13,9 @@ import { useT } from '../strings';
 import '../styles/community.css';
 
 const GOVERNORATES = ['capital', 'hawalli', 'farwaniya', 'mubarak', 'ahmadi', 'jahra'];
-const ANSWERS: Answer[] = ['yes', 'no', 'unknown'];
+// The six questions asked on the form, in order. Two answers each; none is preselected, and an unanswered one stays "unknown".
+const ASKED: QuestionKey[] = ['accessible_parking', 'wheelchair_entrance', 'ramp', 'elevator', 'accessible_toilets', 'seating'];
+const ANSWERS: Answer[] = ['yes', 'no'];
 
 export function AddPlace(_props: {}) {
   const t = useT();
@@ -28,14 +30,14 @@ export function AddPlace(_props: {}) {
   const [pos, setPos] = useState<Pos | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [answers, setAnswers] = useState<Partial<Record<QuestionKey, Answer>>>({});
-  const [note, setNote] = useState('');
+  const sending = useRef(false); // blocks a second send from a quick double press
   const [errors, setErrors] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState<PlaceView | null>(null);
   const errRef = useRef<HTMLDivElement>(null);
 
   const answerOf = (k: QuestionKey): Answer => answers[k] ?? 'unknown';
-  const unanswered = QUESTION_KEYS.filter((k) => answerOf(k) === 'unknown');
+  const unanswered = ASKED.filter((k) => answerOf(k) === 'unknown');
 
   function validate(): string[] {
     const e: string[] = [];
@@ -55,13 +57,15 @@ export function AddPlace(_props: {}) {
 
   async function send() {
     const e = validate();
+    if (sending.current) return;
     if (e.length || !pos || !category) return void setErrors(e);
+    sending.current = true;
     setBusy(true);
     setErrors([]);
     try {
       const place = await submitPlace({
         name: name.trim(), category, governorate: governorate ? t('gov.' + governorate) : '', area, address, description,
-        lat: pos.lat, lng: pos.lng, answers, answers_note: note,
+        lat: pos.lat, lng: pos.lng, answers, answers_note: '',
         photos: photos.map((p) => ({ kind: p.kind, data_url: p.dataUrl })),
       });
       setSaved(place);
@@ -72,6 +76,7 @@ export function AddPlace(_props: {}) {
       setErrors([c === 'rate_limited' ? t('add.err.rate_limited') : c === 'too_long' ? t('add.err.too_long') : t('add.err.submit')]);
       setTimeout(() => errRef.current?.focus(), 0);
     } finally {
+      sending.current = false;
       setBusy(false);
     }
   }
@@ -110,9 +115,8 @@ export function AddPlace(_props: {}) {
           {photos.length > 0 && <ul className="cm-thumbs cm-small">{photos.map((p) => <li key={p.id}><img src={p.dataUrl} alt={t('photo.' + p.kind)} /></li>)}</ul>}
           <h2>{t('add.sec.access')}</h2>
           <ul className="cm-answers">
-            {QUESTION_KEYS.map((k) => <li key={k}><span>{t('q.' + k)}</span><strong className={`cm-ans cm-ans-${answerOf(k)}`}>{t('ans.' + answerOf(k))}</strong></li>)}
+            {ASKED.map((k) => <li key={k}><span>{t('q.' + k)}</span><strong className={`cm-ans cm-ans-${answerOf(k)}`}>{t('ans.' + answerOf(k))}</strong></li>)}
           </ul>
-          {note && <p dir="auto">{note}</p>}
           {unanswered.length > 0 && (
             <div className="cm-unanswered">
               <strong>{t('add.review.unanswered')}</strong>
@@ -180,23 +184,19 @@ export function AddPlace(_props: {}) {
         <fieldset className="glass cm-card">
           <legend><h2>{t('add.sec.access')}</h2></legend>
           <p className="small">{t('add.access.hint')}</p>
-          {QUESTION_KEYS.map((k) => (
+          {ASKED.map((k) => (
             <div key={k} className="cm-q" role="radiogroup" aria-labelledby={`q-${k}`}>
               <span id={`q-${k}`} className="cm-q-label">{t('q.' + k)}</span>
-              <div className="cm-seg">
+              <div className="cm-seg cm-seg-2">
                 {ANSWERS.map((a) => (
-                  <label key={a} className={`cm-opt${answerOf(k) === a ? ' on' : ''}`}>
-                    <input type="radio" name={`q-${k}`} value={a} checked={answerOf(k) === a} onChange={() => setAnswers({ ...answers, [k]: a })} />
+                  <label key={a} className={`cm-opt${answers[k] === a ? ' on' : ''}`}>
+                    <input type="radio" name={`q-${k}`} value={a} checked={answers[k] === a} onChange={() => setAnswers({ ...answers, [k]: a })} />
                     <span>{t('ans.' + a)}</span>
                   </label>
                 ))}
               </div>
-              <AiHelp label={t('add.help.q')} prompt={() => `${t('add.help.q')}: «${t('q.' + k)}»`} />
             </div>
           ))}
-          <label>{t('add.access.note')} <span className="small">({t('add.optional')})</span>
-            <textarea className="field" rows={3} maxLength={600} value={note} onChange={(e) => setNote(e.target.value)} />
-          </label>
         </fieldset>
 
         <button type="submit" className="btn btn-primary btn-block">{t('add.review')}</button>

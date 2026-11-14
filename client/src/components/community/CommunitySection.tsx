@@ -7,6 +7,9 @@ import { useT } from '../../strings';
 import '../../styles/community.css';
 
 // The label shown on every community place: never a verified badge unless a moderator marked it so.
+// The six questions the form asks. Older places may also carry other answers, which are still shown.
+const ASKED = ['accessible_parking', 'wheelchair_entrance', 'ramp', 'elevator', 'accessible_toilets', 'seating'];
+
 export function CommunityBadge({ place }: { place: PlaceView }) {
   const t = useT();
   const c = place.community;
@@ -58,7 +61,7 @@ export function CommunitySection({ place }: { place: PlaceView }) {
       )}
       <h2>{t('com.answers')}</h2>
       <ul className="cm-answers">
-        {QUESTION_KEYS.map((k) => {
+        {QUESTION_KEYS.filter((k) => ASKED.includes(k) || (c.answers[k] && c.answers[k] !== 'unknown')).map((k) => {
           const a = c.answers[k] ?? 'unknown';
           return <li key={k}><span>{t('q.' + k)}</span><strong className={`cm-ans cm-ans-${a}`}>{t('ans.' + a)}</strong></li>;
         })}
