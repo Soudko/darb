@@ -14,7 +14,12 @@ Kuwait AI Hackathon, 14 Nov 2026. The plan pack lives in a separate repository (
 - `npm test`, `npm run typecheck`
 
 ## AI settings (names only; values in `.env` or Replit Secrets, never in a file)
-`AI_BASE_URL`, `AI_API_KEY`, `AI_MODEL`. When `AI_BASE_URL` is empty, Replit AI Integrations' `AI_INTEGRATIONS_OPENAI_BASE_URL` and `AI_INTEGRATIONS_OPENAI_API_KEY` are used. Without either, the app says honestly that the AI is not set up.
+First match wins:
+1. `AI_BASE_URL` set to another server (for example LM Studio): that server, with `AI_API_KEY` if it needs one. The OpenAI key is never sent there.
+2. `OPENAI_API_KEY` (or a real `AI_API_KEY`): OpenAI, model `gpt-6-luna` unless `AI_MODEL` names another.
+3. Replit AI Integrations: `AI_INTEGRATIONS_OPENAI_BASE_URL` and `AI_INTEGRATIONS_OPENAI_API_KEY`.
+
+A placeholder key such as `PASTE_KEY_HERE` counts as not set. Without a real key the app says honestly that the AI is not switched on. A wrong key, no credit or a wrong model name each show their own message.
 
 ## Adding places
 See `data/README.md`. Only checked facts, each with its source and date. Anything unchecked is "unknown".

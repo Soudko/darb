@@ -4,8 +4,10 @@ import { NeedsPicker } from '../components/assistant/NeedsPicker';
 import { Composer, MAX_LEN } from '../components/assistant/Composer';
 import { Turn, type PickView, type TurnData } from '../components/assistant/Turn';
 import { ApiFailure, askAssistant, getPlaces } from '../lib/api';
+import { speak, stopSpeaking, unlockSpeech } from '../lib/speak';
 import { deviceId, getPrefs, usePrefs } from '../state/prefs';
-import { useT } from '../strings';
+import { t as text, useT } from '../strings';
+import type { AssistantResponse, ChatTurn } from '../../../shared/types';
 import '../styles/assistant.css';
 
 const QUICK = ['assistant.q1', 'assistant.q2', 'assistant.q3', 'assistant.q4'];
@@ -15,6 +17,24 @@ const EXAMPLES = ['assistant.ex1', 'assistant.ex2', 'assistant.ex3'];
 // details shows the same conversation. It is gone when the page is closed or reloaded.
 let savedTurns: TurnData[] = [];
 let savedNextId = 1;
+
+const HISTORY_TURNS = 6; // the last six questions and answers go back to the AI for follow-ups
+
+// What the AI said, in words, for the conversation history and for reading aloud.
+function replyText(r: AssistantResponse): { content: string; lang?: 'ar' | 'en' } {
+  if (r.kind === 'answer') return { content: r.reply, lang: r.reply_lang };
+  return { content: text(r.kind === 'medical' ? 'honest.medical' : 'honest.no_data') };
+}
+
+function historyOf(turns: TurnData[]): ChatTurn[] {
+  return turns
+    .filter((x) => x.status === 'done' && x.response)
+    .slice(-HISTORY_TURNS)
+    .flatMap((x) => [
+      { role: 'user' as const, content: x.question },
+      { role: 'assistant' as const, content: replyText(x.response!).content },
+    ]);
+}
 
 export function Assistant({ initialQuestion }: { initialQuestion?: string }) {
   const t = useT();
@@ -26,6 +46,16 @@ export function Assistant({ initialQuestion }: { initialQuestion?: string }) {
   useEffect(() => {
     savedTurns = turns;
   }, [turns]);
+  const turnsRef = useRef(turns);
+  turnsRef.current = turns;
+  const open = useRef(true);
+  useEffect(() => {
+    open.current = true;
+    return () => {
+      open.current = false;
+      stopSpeaking();
+    };
+  }, []);
   const busy = turns.some((x) => x.status === 'loading');
   const nextId = useRef(savedNextId);
   const busyRef = useRef(false);
@@ -39,26 +69,34 @@ export function Assistant({ initialQuestion }: { initialQuestion?: string }) {
     const question = raw.trim().slice(0, MAX_LEN);
     if (!question || busyRef.current) return;
     busyRef.current = true;
+    stopSpeaking();
+    if (getPrefs().readAloud) unlockSpeech();
+    const history = historyOf(turnsRef.current);
     const id = nextId.current++;
     savedNextId = nextId.current;
     setTurns((all) => [...all, { id, question, status: 'loading' }]);
     setText('');
     const prefs = getPrefs();
     try {
-      const response = await askAssistant({ question, needs: prefs.needs, lang: prefs.lang, device_id: deviceId() });
+      const simple = prefs.simplified || prefs.textSize === 'larger';
+      const response = await askAssistant({ question, needs: prefs.needs, lang: prefs.lang, device_id: deviceId(), history, simple });
       let picks: PickView[] = [];
       if (response.kind === 'answer' && response.places.length) {
         try {
           const all = await getPlaces();
           picks = response.places.flatMap((p) => {
             const place = all.find((x) => x.id === p.place_id);
-            return place ? [{ place, why_ar: p.why_ar, why_en: p.why_en, facts: p.facts ?? [] }] : [];
+            return place ? [{ place, why: p.why, facts: p.facts ?? [] }] : [];
           });
         } catch {
           picks = [];
         }
       }
       patch(id, { status: 'done', response, picks });
+      if (getPrefs().readAloud && open.current) {
+        const said = replyText(response);
+        speak(said.content, said.lang ?? getPrefs().lang);
+      }
     } catch (e) {
       patch(id, { status: 'error', errorCode: e instanceof ApiFailure ? e.code : 'server_error' });
     } finally {

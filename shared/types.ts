@@ -52,24 +52,31 @@ export interface PlaceView extends Place {
 export type Lang = 'ar' | 'en';
 
 // POST /api/assistant
+// One earlier message of this conversation, kept on the phone and sent back for follow-up questions.
+export interface ChatTurn {
+  role: 'user' | 'assistant';
+  content: string; // user: up to 500 characters; assistant: up to 2500
+}
+
 export interface AssistantRequest {
   question: string; // 1 to 500 characters
   needs: Need[];
-  lang: Lang;
+  lang: Lang; // the screen language; the reply follows the language the user writes in
   device_id: string;
+  history?: ChatTurn[]; // the last messages, oldest first, at most 12
+  simple?: boolean; // simplified interface or the largest text: short, step-by-step answers
 }
 
 export interface AssistantPlacePick {
   place_id: string;
-  why_ar: string;
-  why_en: string;
+  why: string; // in the reply's language
   facts: string[]; // facility keys or point ids that back the reason, all checked by the server
 }
 
 export type AssistantResponse =
   | { kind: 'medical' }
   | { kind: 'no_data' }
-  | { kind: 'answer'; reply_ar: string; reply_en: string; places: AssistantPlacePick[]; model: string };
+  | { kind: 'answer'; reply: string; reply_lang: Lang; places: AssistantPlacePick[]; model: string };
 
 // Every error from the server has this shape.
 export type ErrorCode =
@@ -78,6 +85,9 @@ export type ErrorCode =
   | 'rate_limited'
   | 'ai_not_set_up'
   | 'ai_no_answer'
+  | 'ai_auth_failed'
+  | 'ai_quota'
+  | 'ai_model'
   | 'not_found'
   | 'server_error';
 

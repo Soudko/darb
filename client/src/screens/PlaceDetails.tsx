@@ -172,7 +172,7 @@ function FacilitiesPanel({ place }: { place: PlaceView }) {
               </span>
             </div>
             {note && <p className="fac-note">{note}</p>}
-            {f && (
+            {f && avail !== 'unknown' && (
               <p className="small fac-source">
                 {t('fac.source')}: {f.source} · <span dir="ltr">{f.date}</span>
                 <br />
