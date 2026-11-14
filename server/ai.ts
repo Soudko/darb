@@ -9,7 +9,9 @@ function config(): AiConfig {
   const useReplit = !own;
   const base = (own || (env.AI_INTEGRATIONS_OPENAI_BASE_URL || '')).trim().replace(/\/+$/, '');
   const key = useReplit ? env.AI_INTEGRATIONS_OPENAI_API_KEY || '' : env.AI_API_KEY || '';
-  return { base, key, model: (env.AI_MODEL || '').trim() || 'gpt-4.1-mini' };
+  // A placeholder key (for example PASTE_KEY_HERE) means the real key is not added yet: not set up.
+  const placeholder = /paste|placeholder|your[_-]?key|changeme/i.test(key);
+  return { base: placeholder ? '' : base, key, model: (env.AI_MODEL || '').trim() || 'gpt-4.1-mini' };
 }
 
 export function aiStatus(): { status: 'ready' | 'not_set_up'; model?: string } {
