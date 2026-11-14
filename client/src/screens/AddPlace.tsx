@@ -205,16 +205,12 @@ export function AddPlace(_props: {}) {
               </select>
             </label>
             {(GROUPS.find((g) => g.key === group) ?? GROUPS[0]).questions.map((k) => (
-              <div key={group + k} className="cm-q" role="radiogroup" aria-labelledby={`q-${k}`}>
-                <span id={`q-${k}`} className="cm-q-label">{t('q.' + k)}</span>
-                <div className="cm-seg">
-                  {ANSWERS.map((a) => (
-                    <label key={a} className={`cm-opt${answerOf(k) === a ? ' on' : ''}`}>
-                      <input type="radio" name={`q-${k}`} value={a} checked={answerOf(k) === a} onChange={() => setAnswers({ ...answers, [k]: a })} />
-                      <span>{t('ans.' + a)}</span>
-                    </label>
-                  ))}
-                </div>
+              <div key={group + k} className="cm-q">
+                <label>{t('q.' + k)}
+                  <select className="field" value={answerOf(k)} onChange={(e) => setAnswers({ ...answers, [k]: e.target.value as Answer })}>
+                    {ANSWERS.map((a) => <option key={a} value={a}>{t('ans.' + a)}</option>)}
+                  </select>
+                </label>
                 <AiHelp label={t('add.help.q')} prompt={() => `${t('add.help.q')}: «${t('q.' + k)}»`} />
               </div>
             ))}
