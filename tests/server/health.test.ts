@@ -21,4 +21,10 @@ describe('GET /api/health', () => {
     expect(res.text).not.toContain('test-secret-value');
     expect(res.text).not.toContain('secret-host');
   });
+  it('a placeholder key counts as not set up, even with an address', async () => {
+    process.env.AI_BASE_URL = 'https://example.test/v1';
+    process.env.AI_API_KEY = 'PASTE_KEY_HERE';
+    const res = await call(createApp(), 'GET', '/api/health');
+    expect(res.body).toEqual({ ok: true, ai: 'not_set_up' });
+  });
 });
