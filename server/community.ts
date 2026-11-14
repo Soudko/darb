@@ -87,7 +87,8 @@ function adminOnly(req: express.Request) {
 
 export function communityRouter(): Router {
   const router = Router();
-  router.use(express.json({ limit: '12mb' }));
+  const big = express.json({ limit: '12mb' }); // photos: only on POST /places, and only after the rate limit
+  const small = express.json({ limit: '10kb' });
   const hits = new Map<string, number[]>();
   const over = (key: string, max: number) => {
     const now = Date.now();
@@ -103,14 +104,17 @@ export function communityRouter(): Router {
     try {
       const r = await db().query(`SELECT mime, data FROM community_photos p JOIN community_places c ON c.id = p.place_id WHERE p.id = $1 AND c.status <> 'rejected'`, [req.params.id]);
       if (!r.rows[0]) throw new HttpError(404, 'not_found', 'Not found.');
-      res.set({ 'Content-Type': r.rows[0].mime, 'Cache-Control': 'public, max-age=86400', 'X-Content-Type-Options': 'nosniff' });
+      res.set({ 'Content-Type': r.rows[0].mime, 'Cache-Control': 'public, max-age=600', 'X-Content-Type-Options': 'nosniff' });
       res.send(r.rows[0].data);
     } catch (e) { next(e); }
   });
 
-  router.post('/places', async (req, res, next) => {
+  // The rate limit runs before the large body is read, so a flood of 12 MB uploads is turned away cheaply.
+  const submitLimit: express.RequestHandler = (req, _res, next) =>
+    next(over(`sub:${req.ip}`, MAX_SUBMITS) ? new HttpError(429, 'rate_limited', 'Too many submissions. Please try again later.') : undefined);
+
+  router.post('/places', submitLimit, big, async (req, res, next) => {
     try {
-      if (over(`sub:${req.ip}`, MAX_SUBMITS)) throw new HttpError(429, 'rate_limited', 'Too many submissions. Please try again later.');
       const b = req.body ?? {};
       const name = clean(b.name, 120);
       if (!name) throw new HttpError(400, 'bad_request', 'The place name is required.');
@@ -162,7 +166,7 @@ export function communityRouter(): Router {
     } catch (e) { next(e); }
   });
 
-  router.post('/places/:id/report', async (req, res, next) => {
+  router.post('/places/:id/report', small, async (req, res, next) => {
     try {
       if (over(`rep:${req.ip}`, MAX_REPORTS)) throw new HttpError(429, 'rate_limited', 'Too many reports. Please try again later.');
       const message = clean(req.body?.message, 500);
@@ -180,7 +184,7 @@ export function communityRouter(): Router {
       res.json({ reports: (await db().query(`SELECT id, place_id, message, created_at FROM community_reports ORDER BY created_at DESC LIMIT 200`)).rows });
     } catch (e) { next(e); }
   });
-  router.patch('/places/:id/status', async (req, res, next) => {
+  router.patch('/places/:id/status', small, async (req, res, next) => {
     try {
       adminOnly(req);
       const status = req.body?.status;
