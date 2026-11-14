@@ -1,0 +1,1 @@
+- [Imported tooling compatibility](tooling-compatibility.md) — keep setup changes minimal while respecting the package firewall and the existing runtime.

@@ -9,7 +9,7 @@ Kuwait AI Hackathon, 14 Nov 2026. The plan pack lives in a separate repository (
 - **Feature 1, the adaptive AI assistant:** suggests up to three places that suit your needs, says why, and shows the checked facts with their sources. Unknown place → "Darb has no information about this place yet." Medical question → "This is not medical advice."
 
 ## Commands
-- `npm install`, then `npm run dev` (server on localhost:3101, screens on localhost:5173)
+- `npm install`, then `npm run dev` (server on localhost:3101, screens on localhost:5000; on Replit use the **Start application** workflow)
 - `npm run build`, then `npm start` (one server; HOST and PORT from the environment; on Replit it listens on 0.0.0.0)
 - `npm test`, `npm run typecheck`
 
