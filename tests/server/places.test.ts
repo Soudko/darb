@@ -42,8 +42,13 @@ describe('GET /api/places', () => {
   });
   it('the real data: no sample place, and every yes/no fact has a web source and a date', async () => {
     const res = await call(createApp(), 'GET', '/api/places');
-    expect(res.body.places.length).toBeGreaterThanOrEqual(2);
-    for (const place of res.body.places) {
+    // Darb's own places only: community places (from the database) are labelled "not verified" instead.
+    const own = res.body.places.filter((p: any) => !p.community);
+    expect(own.length).toBeGreaterThanOrEqual(2);
+    for (const place of res.body.places.filter((p: any) => p.community)) {
+      for (const f of Object.values(place.facilities) as any[]) expect(f.source).toMatch(/not verified/);
+    }
+    for (const place of own) {
       expect(place.is_sample).toBeFalsy();
       for (const f of Object.values(place.facilities) as any[]) {
         if (f.available === 'unknown') continue;
