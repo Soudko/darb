@@ -41,7 +41,6 @@ externalPort = 80
 [userenv]
 
 [userenv.shared]
-AI_MODEL = "gpt-4.1-mini"
 
 [deployment]
 deploymentTarget = "autoscale"
