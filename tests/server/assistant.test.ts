@@ -8,6 +8,8 @@ vi.mock('../../server/ai', () => ({
   askJson: ai.askJson,
 }));
 vi.mock('../../server/places', () => ({ getPlaces: () => store.places }));
+const community = vi.hoisted(() => ({ places: [] as any[] }));
+vi.mock('../../server/community', async (real) => ({ ...(await real<object>()), listCommunityPlaces: async () => community.places }));
 
 import { createApp } from '../../server/app';
 import { call } from './helper';
@@ -26,6 +28,7 @@ beforeEach(() => {
   ai.status = 'ready';
   ai.askJson.mockReset();
   store.places = [mk('real-1')];
+  community.places = [];
 });
 
 describe('validation', () => {
@@ -169,6 +172,11 @@ describe('conversation', () => {
     expect((await post(body())).status).toBe(502);
     ai.askJson.mockResolvedValueOnce({ medical: false }).mockResolvedValueOnce(answer([], { reply: 'في ذا أفنيوز منحدرات.' }));
     expect((await post(body())).status).toBe(502);
+  });
+  it('a community place with a very short name cannot block ordinary answers', async () => {
+    community.places = [{ ...mk('c-1'), name_ar: 'في', name_en: 'a', community: { verification: 'unverified' } }];
+    ai.askJson.mockResolvedValueOnce({ medical: false }).mockResolvedValueOnce(answer([], { reply: 'AI is a kind of computer program.' }));
+    expect((await post(body())).body.kind).toBe('answer');
   });
   it('the reply language follows the text, not the model\'s label', async () => {
     ai.askJson.mockResolvedValueOnce({ medical: false }).mockResolvedValueOnce(answer([], { reply: 'هلا والله', reply_lang: 'en' }));

@@ -7,8 +7,10 @@ afterEach(() => { process.env = { ...saved }; });
 
 describe('GET /api/health', () => {
   it('says not_set_up with no AI', async () => {
-    delete process.env.AI_BASE_URL;
-    delete process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
+    // Clear every AI setting, so a real key in the workspace (Replit Secrets) cannot change the result.
+    for (const k of ['AI_BASE_URL', 'AI_API_KEY', 'OPENAI_API_KEY', 'AI_INTEGRATIONS_OPENAI_BASE_URL', 'AI_INTEGRATIONS_OPENAI_API_KEY']) {
+      delete process.env[k];
+    }
     const res = await call(createApp(), 'GET', '/api/health');
     expect(res.body).toEqual({ ok: true, ai: 'not_set_up' });
   });

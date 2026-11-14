@@ -119,7 +119,8 @@ function checkAnswer(raw: Record<string, unknown>, places: PlaceView[]): Assista
   // The model picked places but none survived the check: its reply may name them, so show nothing.
   if (asked.length > 0 && picks.length === 0) throw noAnswer();
   // A reply that talks about a Darb place must show it as a checked card, so every claim is backed.
-  const aboutPlaces = picks.length > 0 || namesARecord(reply, places);
+  // Only Darb's own records are matched by name: a community name can be any short word ("a", «في»).
+  const aboutPlaces = picks.length > 0 || namesARecord(reply, places.filter((p) => !p.community));
   if (aboutPlaces && picks.length === 0) throw noAnswer();
   // Claims about places never promise safety. (General talk may use the word, e.g. "road safety".)
   const placeTexts = aboutPlaces ? [reply, ...picks.map((p) => p.why)] : [];
