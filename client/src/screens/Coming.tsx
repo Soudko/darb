@@ -1,9 +1,10 @@
-import { Hourglass } from 'lucide-react';
+import { Hourglass, Sparkles } from 'lucide-react';
+import { go } from '../lib/nav';
 import { useT } from '../strings';
 import { Screen } from '../components/Screen';
 import '../styles/shell.css';
 
-const known = ['voice', 'seating', 'companion', 'favourites', 'report', 'alerts'];
+const known = ['voice', 'seating', 'companion', 'favourites', 'report', 'alerts', 'support', 'government', 'services'];
 
 export function Coming({ name }: { name: string }) {
   const t = useT();
@@ -14,7 +15,11 @@ export function Coming({ name }: { name: string }) {
         <Hourglass className="sh-coming-ic" aria-hidden="true" />
         <h2>{title}</h2>
         <p>{t('coming.soon')}</p>
+        {name === 'government' && <p className="small">{t('coming.gov_note')}</p>}
       </section>
+      <button type="button" className="btn btn-primary btn-block" onClick={() => go('assistant')}>
+        <Sparkles size={20} aria-hidden="true" />{t('home.ask')}
+      </button>
     </Screen>
   );
 }
