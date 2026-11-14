@@ -1,25 +1,123 @@
 {
   "places": [
     {
-      "id": "sample-place",
-      "name_ar": "مكان تجريبي",
-      "name_en": "Sample place",
-      "is_sample": true,
+      "id": "the-avenues",
+      "name_ar": "ذا أفنيوز",
+      "name_en": "The Avenues",
       "type": "mall",
-      "lat": 29.3759,
-      "lng": 47.9774,
+      "lat": 29.3035,
+      "lng": 47.9391,
       "photo": "",
       "facilities": {
-        "entrances": { "available": "yes", "note_en": "Sample: step-free main entrance", "source": "Darb team sample (not a real place)", "date": "2026-11-14" },
-        "parking": { "available": "yes", "count": 4, "source": "Darb team sample (not a real place)", "date": "2026-11-14" },
-        "lifts": { "available": "yes", "source": "Darb team sample (not a real place)", "date": "2026-11-14" },
-        "toilets": { "available": "unknown", "source": "Darb team sample (not a real place)", "date": "2026-11-14" },
-        "seating": { "available": "no", "source": "Darb team sample (not a real place)", "date": "2026-11-14" }
+        "entrances": {
+          "available": "unknown",
+          "source": "Not checked yet",
+          "date": "2026-11-14"
+        },
+        "parking": {
+          "available": "unknown",
+          "source": "Not checked yet",
+          "date": "2026-11-14"
+        },
+        "lifts": {
+          "available": "unknown",
+          "source": "Not checked yet",
+          "date": "2026-11-14"
+        },
+        "toilets": {
+          "available": "yes",
+          "note_ar": "يذكر الموقع الرسمي دورات مياه مهيأة للضيوف من ذوي الإعاقة.",
+          "note_en": "The official services page lists accessible restroom facilities for guests with disabilities.",
+          "source": "The Avenues official website: https://www.the-avenues.com/kuwait/en/services",
+          "date": "2026-11-14"
+        },
+        "seating": {
+          "available": "yes",
+          "note_ar": "يذكر الموقع الرسمي مقاعد وفيرة في الساحة الكبرى، دون بيان ما إذا كانت مهيأة لذوي الإعاقة.",
+          "note_en": "The official about page says the Grand Plaza has ample seating; it does not say whether it is accessible.",
+          "source": "The Avenues official website: https://the-avenues.com/kuwait/en/about",
+          "date": "2026-11-14"
+        }
       },
-      "points": [
-        { "id": "sample-entrance", "kind": "entrance", "name_ar": "المدخل الرئيسي", "name_en": "Main entrance", "lat": 29.37595, "lng": 47.97745, "accessible": true, "quiet": false },
-        { "id": "sample-parking", "kind": "parking", "name_ar": "موقف ذوي الإعاقة", "name_en": "Accessible parking", "lat": 29.37585, "lng": 47.97735, "accessible": true, "quiet": false }
-      ]
+      "points": []
+    },
+    {
+      "id": "al-kout-mall",
+      "name_ar": "الكوت مول",
+      "name_en": "Al Kout Mall",
+      "type": "mall",
+      "lat": 29.0801,
+      "lng": 48.1418,
+      "photo": "",
+      "facilities": {
+        "entrances": {
+          "available": "unknown",
+          "source": "Not checked yet",
+          "date": "2026-11-14"
+        },
+        "parking": {
+          "available": "unknown",
+          "source": "Not checked yet",
+          "date": "2026-11-14"
+        },
+        "lifts": {
+          "available": "yes",
+          "note_ar": "يذكر بيان مجموعة تمدين الرسمي (أبريل 2018) مداخل من موقف السيارات فيها مصاعد ودرج كهربائي.",
+          "note_en": "Tamdeen Group's own press release (April 2018) says car-park entrances have elevators and escalators.",
+          "source": "Tamdeen Group official website: https://www.tamdeen.com/16april2018.shtml",
+          "date": "2026-11-14"
+        },
+        "toilets": {
+          "available": "unknown",
+          "source": "Not checked yet",
+          "date": "2026-11-14"
+        },
+        "seating": {
+          "available": "unknown",
+          "source": "Not checked yet",
+          "date": "2026-11-14"
+        }
+      },
+      "points": []
+    },
+    {
+      "id": "scientific-center-kuwait",
+      "name_ar": "المركز العلمي الكويتي",
+      "name_en": "The Scientific Center of Kuwait",
+      "type": "other",
+      "lat": 29.3496,
+      "lng": 48.0895,
+      "photo": "",
+      "facilities": {
+        "entrances": {
+          "available": "yes",
+          "note_ar": "تقول الأسئلة الشائعة الرسمية للمركز إن المكان مهيأ بالكامل لمستخدمي الكراسي المتحركة.",
+          "note_en": "The centre's official FAQ says the venue is fully wheelchair accessible.",
+          "source": "The Scientific Center of Kuwait official website: https://tsck.org.kw/faq/",
+          "date": "2026-11-14"
+        },
+        "parking": {
+          "available": "unknown",
+          "source": "Not checked yet",
+          "date": "2026-11-14"
+        },
+        "lifts": {
+          "available": "unknown",
+          "source": "Not checked yet",
+          "date": "2026-11-14"
+        },
+        "toilets": {
+          "available": "unknown",
+          "source": "Not checked yet",
+          "date": "2026-11-14"
+        },
+        "seating": {
+          "available": "unknown",
+          "source": "Not checked yet",
+          "date": "2026-11-14"
+        }
+      },
+      "points": []
     }
   ]
 }

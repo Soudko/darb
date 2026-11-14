@@ -38,7 +38,19 @@ describe('GET /api/places', () => {
     const res = await call(createApp(), 'GET', '/api/places');
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.places)).toBe(true);
-    expect(res.body.places[0]).toMatchObject({ id: 'sample-place', status: 'partial', is_sample: true });
+    for (const place of res.body.places) expect(['full', 'partial', 'unknown']).toContain(place.status);
+  });
+  it('the real data: no sample place, and every yes/no fact has a web source and a date', async () => {
+    const res = await call(createApp(), 'GET', '/api/places');
+    expect(res.body.places.length).toBeGreaterThanOrEqual(2);
+    for (const place of res.body.places) {
+      expect(place.is_sample).toBeFalsy();
+      for (const f of Object.values(place.facilities) as any[]) {
+        if (f.available === 'unknown') continue;
+        expect(f.source).toMatch(/https?:\/\//);
+        expect(f.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      }
+    }
   });
   it('unknown /api route is a 404 not_found', async () => {
     const res = await call(createApp(), 'GET', '/api/nope');
