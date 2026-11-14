@@ -1,6 +1,12 @@
 // Wording for adding community places, in Arabic and English.
 export const community: { ar: Record<string, string>; en: Record<string, string> } = {
   ar: {
+    'voice.mic': 'تكلّم مع درب',
+    'voice.stop': 'إيقاف الاستماع',
+    'voice.listening': 'أسمعك... تكلّم الحين',
+    'voice.denied': 'ما قدرت أوصل للمايك. اسمح للمتصفح باستخدام المايك أو اكتب سؤالك.',
+    'voice.unsupported': 'متصفحك ما يدعم الإدخال الصوتي. جرّب Chrome أو اكتب سؤالك.',
+    'voice.nothing': 'ما سمعت شي. جرّب مرة ثانية.',
     'add.card.title': 'إضافة مكان جديد',
     'add.card.sub': 'صوّر المكان، حدّد موقعه، وساعد غيرك بمعرفة مدى تهيئته',
     'add.title': 'إضافة مكان جديد',
@@ -118,6 +124,12 @@ export const community: { ar: Record<string, string>; en: Record<string, string>
     'assistant.open_place': 'تفاصيل المكان',
   },
   en: {
+    'voice.mic': 'Talk to Darb',
+    'voice.stop': 'Stop listening',
+    'voice.listening': 'Listening... speak now',
+    'voice.denied': 'Could not reach the microphone. Allow microphone access in the browser, or type your question.',
+    'voice.unsupported': 'This browser does not support voice input. Try Chrome, or type your question.',
+    'voice.nothing': 'I did not hear anything. Try again.',
     'add.card.title': 'Add a new place',
     'add.card.sub': 'Photograph the place, mark its location, and help others know how accessible it is',
     'add.title': 'Add a new place',

@@ -1,7 +1,7 @@
 // What the assistant is doing right now, so the bottom-bar button can show it. Never stored.
 import { useSyncExternalStore } from 'react';
 
-export type AiActivity = 'idle' | 'thinking' | 'speaking';
+export type AiActivity = 'idle' | 'listening' | 'thinking' | 'speaking';
 let current: AiActivity = 'idle';
 const listeners = new Set<() => void>();
 
