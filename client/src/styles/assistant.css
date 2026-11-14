@@ -45,3 +45,10 @@
 /* AI replies keep the line breaks of numbered steps; the Listen button sits under the text. */
 .as-reply { white-space: pre-line; margin: 0; }
 .as-listen { min-height: var(--tap); padding: 0 16px; font-size: var(--fs-small); }
+
+.as-mic { flex: none; padding: 0; width: var(--tap); min-width: var(--tap); }
+.as-mic.is-listening { background: var(--teal); color: var(--navy); box-shadow: var(--glow); }
+@media (prefers-reduced-motion: no-preference) {
+  .as-mic.is-listening { animation: as-mic-pulse 1.2s ease-in-out infinite; }
+  @keyframes as-mic-pulse { 50% { box-shadow: 0 0 0 8px rgba(110, 217, 209, 0.25); } }
+}

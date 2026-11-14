@@ -1,11 +1,10 @@
-import { Navigation, MapPin, Headset, Landmark, Camera } from 'lucide-react';
+import { Navigation, MapPin, Headset, Landmark, Camera, MapPinPlus } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { go } from '../lib/nav';
 import { usePrefs } from '../state/prefs';
 import { useT } from '../strings';
 import { Screen } from '../components/Screen';
 import { HomeHero } from '../components/shell/HomeHero';
-import { AiOrb } from '../components/shell/AiOrb';
 import '../styles/shell.css';
 
 const tiles: { key: string; Icon: LucideIcon; to: () => void }[] = [
@@ -22,12 +21,15 @@ export function Home(_props: {}) {
     <Screen header={false}>
       <HomeHero />
       <div className="sh-home-body">
-        <button type="button" className="sh-ai" onClick={() => go('assistant')} aria-label={`${t('hm.ai.title')}. ${t('hm.ai.sub')}`}>
+        <button type="button" className="sh-ai" onClick={() => go('add')} aria-label={`${t('add.card.title')}. ${t('add.card.sub')}`}>
           <span className="sh-ai-text">
-            <strong>{t('hm.ai.title')}</strong>
-            <span>{t('hm.ai.sub')}</span>
+            <strong>{t('add.card.title')}</strong>
+            <span>{t('add.card.sub')}</span>
           </span>
-          <AiOrb />
+          <span className="sh-orb decor" aria-hidden="true" style={{ width: 76, height: 76 }}>
+            <span className="sh-orb-glow decor anim" />
+            <span className="sh-orb-ball sh-orb-icon"><MapPinPlus /></span>
+          </span>
         </button>
         <div className="sh-grid">
           {tiles.map(({ key, Icon, to }) => (

@@ -1,2 +1,3 @@
 - [Imported tooling compatibility](tooling-compatibility.md) — keep setup changes minimal while respecting the package firewall and the existing runtime.
 - [Run and publish scope](run-publish-scope.md) — Darb is finished; only run and publish it, and report failures without fixing them.
+- [Community places](community-places.md) — DB-backed user places, ADMIN_TOKEN needed, clean test rows after testing.

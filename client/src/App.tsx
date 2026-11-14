@@ -11,6 +11,7 @@ import { About } from './screens/About';
 import { MapScreen } from './screens/MapScreen';
 import { PlaceDetails } from './screens/PlaceDetails';
 import { Assistant } from './screens/Assistant';
+import { AddPlace } from './screens/AddPlace';
 
 export function App() {
   const route = useRoute();
@@ -23,6 +24,7 @@ export function App() {
     case 'about': return <About />;
     case 'map': return <MapScreen focus={route.query.get('focus') ?? undefined} />;
     case 'place': return <PlaceDetails id={route.param ?? ''} />;
+    case 'add': return <AddPlace />;
     case 'assistant': return <Assistant initialQuestion={route.query.get('q') ?? undefined} />;
     case 'alerts': return <Coming name="alerts" />;
     case 'coming': return <Coming name={route.param ?? ''} />;

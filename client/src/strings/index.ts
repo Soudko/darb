@@ -7,13 +7,14 @@ import { shell } from './shell';
 import { places } from './places';
 import { assistant } from './assistant';
 import { settings } from './settings';
+import { community } from './community';
 import type { Lang } from '../../../shared/types';
 import { getPrefs, subscribePrefs } from '../state/prefs';
 
 type Dict = Record<string, string>;
 const all: Record<Lang, Dict> = {
-  ar: { ...common.ar, ...shell.ar, ...places.ar, ...assistant.ar, ...settings.ar },
-  en: { ...common.en, ...shell.en, ...places.en, ...assistant.en, ...settings.en },
+  ar: { ...common.ar, ...shell.ar, ...places.ar, ...assistant.ar, ...settings.ar, ...community.ar },
+  en: { ...common.en, ...shell.en, ...places.en, ...assistant.en, ...settings.en, ...community.en },
 };
 
 export function t(key: string, lang: Lang = getPrefs().lang): string {

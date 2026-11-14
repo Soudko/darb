@@ -5,6 +5,7 @@ import { Composer, MAX_LEN } from '../components/assistant/Composer';
 import { Turn, type PickView, type TurnData } from '../components/assistant/Turn';
 import { ApiFailure, askAssistant, getPlaces } from '../lib/api';
 import { speak, stopSpeaking, unlockSpeech } from '../lib/speak';
+import { setAiActivity } from '../state/aiActivity';
 import { deviceId, getPrefs, usePrefs } from '../state/prefs';
 import { t as text, useT } from '../strings';
 import type { AssistantResponse, ChatTurn } from '../../../shared/types';
@@ -57,6 +58,10 @@ export function Assistant({ initialQuestion }: { initialQuestion?: string }) {
     };
   }, []);
   const busy = turns.some((x) => x.status === 'loading');
+  useEffect(() => {
+    setAiActivity(busy ? 'thinking' : 'idle');
+    return () => setAiActivity('idle');
+  }, [busy]);
   const nextId = useRef(savedNextId);
   const busyRef = useRef(false);
   const replyRef = useRef<HTMLDivElement>(null);
@@ -65,12 +70,12 @@ export function Assistant({ initialQuestion }: { initialQuestion?: string }) {
   const patch = (id: number, p: Partial<TurnData>) =>
     setTurns((all) => all.map((x) => (x.id === id ? { ...x, ...p } : x)));
 
-  const ask = useCallback(async (raw: string) => {
+  const ask = useCallback(async (raw: string, byVoice = false) => {
     const question = raw.trim().slice(0, MAX_LEN);
     if (!question || busyRef.current) return;
     busyRef.current = true;
     stopSpeaking();
-    if (getPrefs().readAloud) unlockSpeech();
+    if (byVoice || getPrefs().readAloud) unlockSpeech();
     const history = historyOf(turnsRef.current);
     const id = nextId.current++;
     savedNextId = nextId.current;
@@ -93,7 +98,7 @@ export function Assistant({ initialQuestion }: { initialQuestion?: string }) {
         }
       }
       patch(id, { status: 'done', response, picks });
-      if (getPrefs().readAloud && open.current) {
+      if ((byVoice || getPrefs().readAloud) && open.current) {
         const said = replyText(response);
         speak(said.content, said.lang ?? getPrefs().lang);
       }
@@ -161,7 +166,7 @@ export function Assistant({ initialQuestion }: { initialQuestion?: string }) {
         <div className="as-spacer" aria-hidden="true" />
       </div>
 
-      <Composer value={text} onChange={setText} onSubmit={() => void ask(text)} busy={busy} />
+      <Composer value={text} onChange={setText} onSubmit={() => void ask(text)} onVoiceSubmit={(q) => void ask(q, true)} busy={busy} />
     </Screen>
   );
 }
