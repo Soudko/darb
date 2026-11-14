@@ -1,6 +1,9 @@
 // Wording for adding community places, in Arabic and English.
 export const community: { ar: Record<string, string>; en: Record<string, string> } = {
   ar: {
+    'add.access.type': 'اختر نوع الإعاقة ثم حدّد المتوفر',
+    'add.access.answered': 'تمت الإجابة على',
+    'add.access.of': 'من',
     'voice.mic': 'تكلّم مع درب',
     'voice.stop': 'إيقاف الاستماع',
     'voice.listening': 'أسمعك... تكلّم الحين',
@@ -124,6 +127,9 @@ export const community: { ar: Record<string, string>; en: Record<string, string>
     'assistant.open_place': 'تفاصيل المكان',
   },
   en: {
+    'add.access.type': 'Choose a disability type, then mark what is available',
+    'add.access.answered': 'Answered',
+    'add.access.of': 'of',
     'voice.mic': 'Talk to Darb',
     'voice.stop': 'Stop listening',
     'voice.listening': 'Listening... speak now',

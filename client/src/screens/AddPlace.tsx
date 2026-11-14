@@ -1,6 +1,6 @@
 // «إضافة مكان جديد»: a form that saves a community place on the server. Nothing is sent until the user reviews and confirms.
 import { useRef, useState } from 'react';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, ChevronDown } from 'lucide-react';
 import { CATEGORY_KEYS, QUESTION_KEYS } from '../../../shared/types';
 import type { Answer, CategoryKey, PlaceView, QuestionKey } from '../../../shared/types';
 import { Screen } from '../components/Screen';
@@ -14,6 +14,14 @@ import '../styles/community.css';
 
 const GOVERNORATES = ['capital', 'hawalli', 'farwaniya', 'mubarak', 'ahmadi', 'jahra'];
 const ANSWERS: Answer[] = ['yes', 'no', 'unknown'];
+// One drawer, one disability type at a time. A question can appear under several types and keeps one answer.
+const GROUPS: { key: string; questions: QuestionKey[] }[] = [
+  { key: 'mobility', questions: ['wheelchair_entrance', 'ramp', 'step_free', 'elevator', 'accessible_parking', 'accessible_toilets', 'wide_doors', 'seating'] },
+  { key: 'visual', questions: ['visual_aids', 'signage'] },
+  { key: 'hearing', questions: ['hearing_aids', 'signage'] },
+  { key: 'cognitive', questions: ['quiet_space', 'signage'] },
+  { key: 'elderly', questions: ['seating', 'elevator', 'step_free', 'accessible_parking', 'accessible_toilets'] },
+];
 
 export function AddPlace(_props: {}) {
   const t = useT();
@@ -29,6 +37,8 @@ export function AddPlace(_props: {}) {
   const [confirmed, setConfirmed] = useState(false);
   const [answers, setAnswers] = useState<Partial<Record<QuestionKey, Answer>>>({});
   const [note, setNote] = useState('');
+  const [drawer, setDrawer] = useState(false);
+  const [group, setGroup] = useState('mobility');
   const [errors, setErrors] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState<PlaceView | null>(null);
@@ -177,27 +187,42 @@ export function AddPlace(_props: {}) {
           <LocationPicker pos={pos} confirmed={confirmed} onPos={(p) => { setPos(p); setConfirmed(false); }} onConfirm={setConfirmed} />
         </fieldset>
 
-        <fieldset className="glass cm-card">
-          <legend><h2>{t('add.sec.access')}</h2></legend>
-          <p className="small">{t('add.access.hint')}</p>
-          {QUESTION_KEYS.map((k) => (
-            <div key={k} className="cm-q" role="radiogroup" aria-labelledby={`q-${k}`}>
-              <span id={`q-${k}`} className="cm-q-label">{t('q.' + k)}</span>
-              <div className="cm-seg">
-                {ANSWERS.map((a) => (
-                  <label key={a} className={`cm-opt${answerOf(k) === a ? ' on' : ''}`}>
-                    <input type="radio" name={`q-${k}`} value={a} checked={answerOf(k) === a} onChange={() => setAnswers({ ...answers, [k]: a })} />
-                    <span>{t('ans.' + a)}</span>
-                  </label>
-                ))}
+        <section className="glass cm-card cm-drawer">
+          <h2 className="cm-drawer-h">
+            <button type="button" className="cm-drawer-btn" aria-expanded={drawer} aria-controls="cm-drawer-body" onClick={() => setDrawer(!drawer)}>
+              <span>
+                {t('add.sec.access')}
+                <span className="small cm-drawer-count"> {t('add.access.answered')} {QUESTION_KEYS.length - unanswered.length} {t('add.access.of')} {QUESTION_KEYS.length}</span>
+              </span>
+              <ChevronDown size={22} aria-hidden="true" className={drawer ? 'cm-chev open' : 'cm-chev'} />
+            </button>
+          </h2>
+          <div id="cm-drawer-body" hidden={!drawer} className="cm-card">
+            <p className="small">{t('add.access.hint')}</p>
+            <label>{t('add.access.type')}
+              <select className="field" value={group} onChange={(e) => setGroup(e.target.value)}>
+                {GROUPS.map((g) => <option key={g.key} value={g.key}>{t('need.' + g.key)}</option>)}
+              </select>
+            </label>
+            {(GROUPS.find((g) => g.key === group) ?? GROUPS[0]).questions.map((k) => (
+              <div key={group + k} className="cm-q" role="radiogroup" aria-labelledby={`q-${k}`}>
+                <span id={`q-${k}`} className="cm-q-label">{t('q.' + k)}</span>
+                <div className="cm-seg">
+                  {ANSWERS.map((a) => (
+                    <label key={a} className={`cm-opt${answerOf(k) === a ? ' on' : ''}`}>
+                      <input type="radio" name={`q-${k}`} value={a} checked={answerOf(k) === a} onChange={() => setAnswers({ ...answers, [k]: a })} />
+                      <span>{t('ans.' + a)}</span>
+                    </label>
+                  ))}
+                </div>
+                <AiHelp label={t('add.help.q')} prompt={() => `${t('add.help.q')}: «${t('q.' + k)}»`} />
               </div>
-              <AiHelp label={t('add.help.q')} prompt={() => `${t('add.help.q')}: «${t('q.' + k)}»`} />
-            </div>
-          ))}
-          <label>{t('add.access.note')} <span className="small">({t('add.optional')})</span>
-            <textarea className="field" rows={3} maxLength={600} value={note} onChange={(e) => setNote(e.target.value)} />
-          </label>
-        </fieldset>
+            ))}
+            <label>{t('add.access.note')} <span className="small">({t('add.optional')})</span>
+              <textarea className="field" rows={3} maxLength={600} value={note} onChange={(e) => setNote(e.target.value)} />
+            </label>
+          </div>
+        </section>
 
         <button type="submit" className="btn btn-primary btn-block">{t('add.review')}</button>
       </form>
