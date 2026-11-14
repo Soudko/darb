@@ -41,3 +41,7 @@
 .as-fact-ic { flex: none; margin-top: 2px; }
 .as-fact-src { color: var(--text-2); }
 .as-footer { text-align: center; margin: 12px 0 0; }
+
+/* AI replies keep the line breaks of numbered steps; the Listen button sits under the text. */
+.as-reply { white-space: pre-line; margin: 0; }
+.as-listen { min-height: var(--tap); padding: 0 16px; font-size: var(--fs-small); }

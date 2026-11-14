@@ -23,6 +23,8 @@ export const assistant: { ar: Record<string, string>; en: Record<string, string>
     'assistant.ex2': 'هل توجد مواقف مخصصة قرب المدخل؟',
     'assistant.ex3': 'أحتاج مكاناً هادئاً أرتاح فيه',
     'assistant.facts_label': 'ما تم التحقق منه',
+    'assistant.listen': 'استمع',
+    'assistant.stop': 'إيقاف',
   },
   en: {
     'assistant.title': 'AI assistant',
@@ -47,5 +49,7 @@ export const assistant: { ar: Record<string, string>; en: Record<string, string>
     'assistant.ex2': 'Is there accessible parking near the entrance?',
     'assistant.ex3': 'I need a quiet place to rest',
     'assistant.facts_label': 'What was checked',
+    'assistant.listen': 'Listen',
+    'assistant.stop': 'Stop',
   },
 };

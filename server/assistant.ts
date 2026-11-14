@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { FACILITY_KEYS, NEEDS } from '../shared/types';
-import type { AssistantPlacePick, AssistantResponse, Lang, Need, PlaceView } from '../shared/types';
+import type { AssistantPlacePick, AssistantResponse, ChatTurn, Lang, Need, PlaceView } from '../shared/types';
 import { aiStatus, askJson } from './ai';
 import { HttpError } from './errors';
 import { getPlaces } from './places';
@@ -8,22 +8,53 @@ import { getPlaces } from './places';
 const WINDOW_MS = 10 * 60 * 1000;
 const PER_DEVICE = 60;
 const PER_IP = 300; // high enough for several judges behind one proxy address
+const MAX_QUESTION = 500;
+const MAX_REPLY = 2500;
+const MAX_HISTORY = 12;
 
 const MEDICAL_SYSTEM =
-  'You are a filter. Decide whether the user text asks for medical advice, medication, treatment or a diagnosis. ' +
-  'Asking where to find an accessible place is NOT medical. Reply ONLY with JSON: {"medical": true} or {"medical": false}.';
+  'You are a filter. The user text is JSON with the latest "question" and the user\'s "earlier" messages. ' +
+  'Read the question together with the earlier messages (a follow-up like "how much for my child?" after a medicine ' +
+  'question counts). Decide whether it asks for personal medical advice: which medicine or dose to take, ' +
+  'a treatment, or a diagnosis of symptoms. These are NOT medical: finding an accessible place, how to communicate ' +
+  'with or help a disabled person, assistive technology, disability etiquette, rights, everyday life, and general ' +
+  'knowledge. Reply ONLY with JSON: {"medical": true} or {"medical": false}.';
 
-const ANSWER_SYSTEM = `You are Darb's accessibility assistant for Kuwait. Darb helps people with disabilities find places they can use.
-Rules:
-- Use ONLY the place records given in the user message. Use no general knowledge about any place. Do not guess.
-- Pick up to three places that best fit the question and the user's needs.
-- For each pick give why_ar and why_en: one or two short sentences that name only facts found in that place's record (for example "Accessible parking: yes, 120 spaces").
-- In facts[] list the facility keys (entrances, parking, lifts, toilets, seating) or the point ids that back the reason.
-- If nothing fits, say so plainly in reply_ar and reply_en and return places [].
-- If the question mentions any named venue (a hospital, mall, restaurant, park or other place) whose name does not match a record's name_ar or name_en, set unknown_place to true and places to [].
-- Never give medical advice. Never use the words "safe" or «آمن»: Darb guides, it does not promise safety.
-- Write for the needs: cognitive -> short, simple sentences; hearing -> do not rely on sound; visual -> describe in words, never "look for the colour"; elderly -> plain and calm.
-Reply ONLY with JSON: {"unknown_place":bool,"reply_ar":string,"reply_en":string,"places":[{"place_id":string,"why_ar":string,"why_en":string,"facts":[string]}]}`;
+// Saoud's Darb AI personality (14 Nov brief), then Darb's honesty rules and the reply format.
+const PERSONALITY = `You are Darb AI, an intelligent, friendly, and accessible digital assistant developed for people in Kuwait.
+You specialize in supporting people with disabilities, older adults, caregivers, and individuals with different accessibility needs.
+You understand Arabic, Kuwaiti Arabic, and English.
+Respond in the user's preferred language.
+Use simple, clear, respectful language.
+Adapt your explanations to the user's accessibility preferences when provided.
+Help users with everyday questions, technology, navigation, communication, accessibility, and general knowledge.
+Never assume that all people with the same disability have identical needs.
+Ask for clarification when necessary.
+Do not invent verified accessibility information, real-time navigation data, or government services.
+If a question requires current information that is not available through connected tools, explain that limitation.
+Be intelligent, conversational, supportive, and practical.`;
+
+const ANSWER_SYSTEM = `${PERSONALITY}
+
+How Darb works:
+- You can talk about any topic: greetings, everyday questions, technology, communication, accessibility and general knowledge. Keep the conversation going naturally and use the earlier messages for follow-up questions (for example "make your last answer shorter").
+- Reply in the language the user writes in. Kuwaiti or any Arabic -> reply in clear, warm Arabic (light Gulf touches are fine). English -> reply in English. Set reply_lang to "ar" or "en" to match.
+- The user message is JSON with "question", the user's "needs", "simple" and Darb's verified place "records". Facts about a real place may come ONLY from these records. Never state from your own knowledge whether a real venue has a ramp, lift, parking, toilet or any other facility.
+- Whenever your reply mentions one of the records by name, include that record in "places" with its facts.
+- When the question is about finding or visiting a place, pick up to three records that fit and give for each a "why": one or two short sentences, in the reply's language, naming only facts found in that record. In "facts" list the facility keys (entrances, parking, lifts, toilets, seating) or point ids that back it. Otherwise return places [].
+- If the user asks about the accessibility or facilities of a specific named venue (a mall, hospital, restaurant, ministry or other place) that matches no record's name_ar or name_en, set unknown_place to true and places to []. Questions about places in general (for example "what should I check before visiting a mall?") are fine: answer them with general advice.
+- You have no live data: no traffic, opening hours, queues or government service status. Say so when asked.
+- Never give medical advice (medicines, doses, diagnosis). Never call a place or route "safe" («آمن»): Darb guides, it does not promise safety.
+- When asked to reword something the user wrote (for example a request to staff), write a clear, polite version they can show or say.
+- Adapt to the needs: hearing -> everything in text, never rely on sound; visual -> describe in words, never "look for the colour", screen-reader friendly; speech -> the user may type short or broken phrases, understand them kindly; cognitive or simple -> short sentences, one idea each, numbered steps; elderly -> plain, calm and patient; mobility -> think about steps, ramps, lifts, doors and distance.
+- Format: plain text only. Short paragraphs; for steps use lines starting "1." "2." or "•". No markdown, no ** or #, no tables. Usually under 150 words unless the user asks for more.
+Reply ONLY with JSON: {"unknown_place":bool,"reply":string,"reply_lang":"ar"|"en","places":[{"place_id":string,"why":string,"facts":[string]}]}`;
+
+const COGNITIVE_RULE =
+  '\nThe user has cognitive needs: every sentence under 10 words, one idea per sentence, everyday words.';
+const SIMPLE_RULE = '\nThe user asked for a simple interface: keep it short, with numbered steps where it helps.';
+const UNSAFE_WORDS = /\bsafe(ly|ty)?\b|آمن/i;
+const isTrue = (v: unknown) => v === true || v === 'true';
 
 // Short records for the AI: only what it needs, with each place's id.
 function toRecord(p: PlaceView) {
@@ -38,33 +69,37 @@ function toRecord(p: PlaceView) {
   };
 }
 
-const COGNITIVE_RULE =
-  '\nThe user has cognitive needs: every sentence under 10 words, one idea per sentence, everyday words.';
-const UNSAFE_WORDS = /\bsafe(ly|ty)?\b|آمن/i;
-const isTrue = (v: unknown) => v === true || v === 'true';
-
 function cap(v: unknown, max: number): string | null {
   if (typeof v !== 'string') return null;
   const s = v.trim();
   return s ? s.slice(0, max) : null;
 }
 
+// The screens show plain text: take out markdown marks the model may still add.
+const plain = (s: string) => s.replace(/\*\*|__/g, '').replace(/^#{1,6}\s+/gm, '').trim();
+// The language the reply is actually written in: more Arabic letters than Latin ones means Arabic.
+const langOf = (s: string): Lang =>
+  (s.match(/[\u0600-\u06FF]/g)?.length ?? 0) >= (s.match(/[A-Za-z]/g)?.length ?? 0) ? 'ar' : 'en';
+const namesARecord = (s: string, places: PlaceView[]) =>
+  places.some((p) => [p.name_ar, p.name_en].some((n) => n && s.toLowerCase().includes(n.toLowerCase())));
+
 const noAnswer = () => new HttpError(502, 'ai_no_answer', 'The assistant could not answer right now.');
 
 // Check the AI's JSON before the screens ever see it.
 function checkAnswer(raw: Record<string, unknown>, places: PlaceView[]): AssistantResponse {
   if (isTrue(raw.unknown_place)) return { kind: 'no_data' };
-  const reply_ar = cap(raw.reply_ar, 600);
-  const reply_en = cap(raw.reply_en, 600);
-  if (!reply_ar || !reply_en || !Array.isArray(raw.places)) throw noAnswer();
+  const text = cap(raw.reply, MAX_REPLY);
+  if (!text || (raw.places !== undefined && !Array.isArray(raw.places))) throw noAnswer();
+  const reply = plain(text);
+  const reply_lang = langOf(reply);
+  const asked = (raw.places as unknown[] | undefined) ?? [];
 
   const picks: AssistantPlacePick[] = [];
-  for (const item of raw.places as any[]) {
+  for (const item of asked as any[]) {
     if (picks.length >= 3) break;
     const place = places.find((p) => p.id === item?.place_id);
-    const why_ar = cap(item?.why_ar, 300);
-    const why_en = cap(item?.why_en, 300);
-    if (!place || !why_ar || !why_en || !Array.isArray(item.facts)) continue;
+    const why = cap(item?.why, 300);
+    if (!place || !why || !Array.isArray(item.facts)) continue;
     const facts = (item.facts as unknown[]).filter((f): f is string => {
       if (typeof f !== 'string') return false;
       if ((FACILITY_KEYS as string[]).includes(f)) {
@@ -74,25 +109,44 @@ function checkAnswer(raw: Record<string, unknown>, places: PlaceView[]): Assista
       return place.points.some((q) => q.id === f);
     });
     if (!facts.length) continue;
-    picks.push({ place_id: place.id, why_ar, why_en, facts: [...new Set(facts)] });
+    picks.push({ place_id: place.id, why: plain(why), facts: [...new Set(facts)] });
   }
   // The model picked places but none survived the check: its reply may name them, so show nothing.
-  if ((raw.places as unknown[]).length > 0 && picks.length === 0) throw noAnswer();
-  const texts = [reply_ar, reply_en, ...picks.flatMap((p) => [p.why_ar, p.why_en])];
-  if (texts.some((x) => UNSAFE_WORDS.test(x))) throw noAnswer();
-  return { kind: 'answer', reply_ar, reply_en, places: picks, model: aiStatus().model ?? '' };
+  if (asked.length > 0 && picks.length === 0) throw noAnswer();
+  // A reply that talks about a Darb place must show it as a checked card, so every claim is backed.
+  const aboutPlaces = picks.length > 0 || namesARecord(reply, places);
+  if (aboutPlaces && picks.length === 0) throw noAnswer();
+  // Claims about places never promise safety. (General talk may use the word, e.g. "road safety".)
+  const placeTexts = aboutPlaces ? [reply, ...picks.map((p) => p.why)] : [];
+  if (placeTexts.some((x) => UNSAFE_WORDS.test(x))) throw noAnswer();
+  return { kind: 'answer', reply, reply_lang, places: picks, model: aiStatus().model ?? '' };
 }
 
-function parseBody(body: any): { question: string; needs: Need[]; lang: Lang; device: string } {
+function parseHistory(v: unknown): ChatTurn[] {
+  if (v === undefined) return [];
+  if (!Array.isArray(v)) throw new HttpError(400, 'bad_request', 'history must be a list.');
+  const out: ChatTurn[] = [];
+  for (const m of v.slice(-MAX_HISTORY)) {
+    const role = m?.role;
+    if (role !== 'user' && role !== 'assistant') continue;
+    const content = cap(m?.content, role === 'user' ? MAX_QUESTION : MAX_REPLY);
+    if (content) out.push({ role, content });
+  }
+  return out;
+}
+
+interface Parsed { question: string; needs: Need[]; lang: Lang; device: string; history: ChatTurn[]; simple: boolean }
+
+function parseBody(body: any): Parsed {
   const q = typeof body?.question === 'string' ? body.question.trim() : '';
   if (!q) throw new HttpError(400, 'bad_request', 'Please write a question.');
-  if (q.length > 500) throw new HttpError(400, 'too_long', 'The question is too long (500 characters at most).');
+  if (q.length > MAX_QUESTION) throw new HttpError(400, 'too_long', 'The question is too long (500 characters at most).');
   if (body.needs !== undefined && !Array.isArray(body.needs)) throw new HttpError(400, 'bad_request', 'needs must be a list.');
   const needs = ((body.needs ?? []) as unknown[]).filter((n): n is Need => NEEDS.includes(n as Need));
   const lang: Lang = body.lang === 'en' ? 'en' : 'ar';
   const device = body.device_id === undefined ? '' : body.device_id;
   if (typeof device !== 'string' || device.length > 100) throw new HttpError(400, 'bad_request', 'device_id is not valid.');
-  return { question: q, needs, lang, device };
+  return { question: q, needs, lang, device, history: parseHistory(body.history), simple: isTrue(body.simple) };
 }
 
 export function assistantRouter(): Router {
@@ -108,23 +162,25 @@ export function assistantRouter(): Router {
 
   router.post('/', async (req, res, next) => {
     try {
-      const { question, needs, lang, device } = parseBody(req.body);
+      const { question, needs, lang, device, history, simple } = parseBody(req.body);
       const now = Date.now();
       const limited = overLimit(`ip:${req.ip}`, PER_IP, now) || (device !== '' && overLimit(`dev:${device}`, PER_DEVICE, now));
       if (limited) throw new HttpError(429, 'rate_limited', 'Too many questions. Please wait a few minutes.');
       if (aiStatus().status !== 'ready') throw new HttpError(503, 'ai_not_set_up', 'The assistant is not set up yet.');
 
-      const check = await askJson({ system: MEDICAL_SYSTEM, user: question });
+      const earlier = history.filter((m) => m.role === 'user').slice(-3).map((m) => m.content);
+      const check = await askJson({ system: MEDICAL_SYSTEM, user: JSON.stringify({ earlier, question }) });
       if (isTrue(check.medical)) return void res.json({ kind: 'medical' } satisfies AssistantResponse);
 
       const all = getPlaces();
       const real = all.filter((p) => !p.is_sample);
       const places = real.length ? real : all;
-      if (!places.length) return void res.json({ kind: 'no_data' } satisfies AssistantResponse);
 
-      const user = JSON.stringify({ places: places.map(toRecord), needs, language: lang, question });
-      const system = needs.includes('cognitive') ? ANSWER_SYSTEM + COGNITIVE_RULE : ANSWER_SYSTEM;
-      const raw = await askJson({ system, user });
+      const user = JSON.stringify({ question, needs, simple, screen_language: lang, records: places.map(toRecord) });
+      let system = ANSWER_SYSTEM;
+      if (needs.includes('cognitive')) system += COGNITIVE_RULE;
+      if (simple) system += SIMPLE_RULE;
+      const raw = await askJson({ system, user, history });
       res.json(checkAnswer(raw, places));
     } catch (e) {
       next(e);
