@@ -5,14 +5,14 @@ import { BottomBar } from './shell/BottomBar';
 import { useT } from '../strings';
 import '../styles/shell.css';
 
-export interface ScreenProps { title?: string; back?: boolean; bottomBar?: boolean; footer?: boolean; children: ReactNode; }
+export interface ScreenProps { title?: string; back?: boolean; bottomBar?: boolean; footer?: boolean; header?: boolean; children: ReactNode; }
 
-export function Screen({ title, back, bottomBar = true, footer = true, children }: ScreenProps) {
+export function Screen({ title, back, bottomBar = true, footer = true, header = true, children }: ScreenProps) {
   const t = useT();
   return (
     <div className="sh-app">
-      <Header title={title} showBack={back} />
-      <main className={'sh-main' + (bottomBar ? ' has-bar' : '')}>
+      {header && <Header title={title} showBack={back} />}
+      <main className={'sh-main' + (bottomBar ? ' has-bar' : '') + (header ? '' : ' no-header')}>
         {children}
         {footer && <p className="small sh-center sh-footer">{t('honest.footer')}</p>}
       </main>

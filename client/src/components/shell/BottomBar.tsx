@@ -1,27 +1,27 @@
-import { House, Map, Bell, Settings } from 'lucide-react';
+import { House, Map, AudioLines, LayoutGrid, UserRound } from 'lucide-react';
 import { go, useRoute } from '../../lib/nav';
 import { useT } from '../../strings';
 import '../../styles/shell.css';
 
-const items = [
-  { screen: 'home', key: 'nav.home', Icon: House },
-  { screen: 'map', key: 'nav.map', Icon: Map },
-  { screen: 'alerts', key: 'nav.alerts', Icon: Bell },
-  { screen: 'settings', key: 'nav.settings', Icon: Settings },
-];
-
 export function BottomBar() {
   const t = useT();
   const route = useRoute();
-  const current = route.screen || 'home';
+  const s = route.screen || 'home';
+  const services = s === 'coming' && route.param === 'services';
+  const item = (key: string, Icon: typeof House, on: boolean, to: () => void) => (
+    <button key={key} type="button" className="sh-bar-item" aria-current={on ? 'page' : undefined} onClick={to}>
+      <Icon aria-hidden="true" /><span>{t(key)}</span>
+    </button>
+  );
   return (
     <nav className="sh-bar glass-strong" aria-label={t('nav.main')}>
-      {items.map(({ screen, key, Icon }) => (
-        <button key={screen} type="button" className="sh-bar-item" aria-current={current === screen ? 'page' : undefined} onClick={() => go(screen)}>
-          <Icon aria-hidden="true" />
-          <span>{t(key)}</span>
-        </button>
-      ))}
+      {item('nav.home', House, s === 'home', () => go('home'))}
+      {item('nav.map', Map, s === 'map' || s === 'place', () => go('map'))}
+      <button type="button" className="sh-bar-ai" aria-label={t('bar.assistant')} aria-current={s === 'assistant' ? 'page' : undefined} onClick={() => go('assistant')}>
+        <AudioLines aria-hidden="true" />
+      </button>
+      {item('bar.services', LayoutGrid, services, () => go('coming', 'services'))}
+      {item('bar.profile', UserRound, s === 'settings', () => go('settings'))}
     </nav>
   );
 }

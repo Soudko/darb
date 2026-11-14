@@ -14,6 +14,9 @@ export interface Prefs {
   highContrast: boolean;
   readAloud: boolean;
   vibration: boolean;
+  largeTargets: boolean;
+  reducedMotion: boolean;
+  simplified: boolean;
   onboarded: boolean;
 }
 
@@ -26,6 +29,9 @@ const defaults: Prefs = {
   highContrast: false,
   readAloud: false,
   vibration: true,
+  largeTargets: false,
+  reducedMotion: false,
+  simplified: false,
   onboarded: false,
 };
 
@@ -73,6 +79,9 @@ export function applyToDocument(p: Prefs): void {
   el.dataset.theme = p.theme;
   el.dataset.contrast = p.highContrast ? 'high' : 'normal';
   el.dataset.textSize = p.textSize;
+  el.dataset.targets = p.largeTargets ? 'large' : 'normal';
+  el.dataset.motion = p.reducedMotion ? 'reduced' : 'normal';
+  el.dataset.simple = p.simplified ? 'on' : 'off';
 }
 
 // A random code made once per browser, sent with AI requests for the rate limit only.
