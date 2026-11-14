@@ -52,3 +52,5 @@
 .cm-chev { transition: transform var(--motion); flex: none; }
 .cm-chev.open { transform: rotate(180deg); }
 .cm-card[hidden], .cm-drawer [hidden] { display: none !important; }
+
+.cm-seg-2 { grid-template-columns: repeat(2, 1fr); }

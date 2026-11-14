@@ -129,6 +129,8 @@ export function MapScreen({ focus }: { focus?: string }) {
       setView('map');
       setSelectedId(p.id);
       map.current?.setView([p.lat, p.lng], 16);
+      // Shift the view so the marker sits above the place card that opens over the lower half.
+      map.current?.panBy([0, Math.round((map.current.getSize().y || 0) * 0.22)], { animate: false });
     }
   }, [focus, state]);
 
